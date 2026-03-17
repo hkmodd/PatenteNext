@@ -1,0 +1,5 @@
+{
+  "name": "PatenteNext",
+  "description": "Simulatore PWA Open-Source per l'esame della Patente di Guida Italiana con architettura offline-first e UI/UX ad alte prestazioni.",
+  "requestFramePermissions": []
+}
