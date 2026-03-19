@@ -262,7 +262,7 @@ export const quizDatabase: Question[] = [
   }
 ];
 
-import { getRandomQuestions, getDB } from '../lib/db';
+import { getRandomQuestions, getDB, getQuestionsByCategory as dbGetQuestionsByCategory } from '../lib/db';
 
 export const getRandomExam = async (count: number = 30): Promise<Question[]> => {
   const db = await getDB();
@@ -277,4 +277,44 @@ export const getRandomExam = async (count: number = 30): Promise<Question[]> => 
   // If we have data in IndexedDB, use it
   const questions = await getRandomQuestions(count);
   return questions;
+};
+
+export const getExamByCategory = async (category: string, count: number = 20): Promise<Question[]> => {
+  const db = await getDB();
+  const allKeys = await db.getAllKeys('questions');
+
+  if (allKeys.length === 0) {
+    // Fallback
+    const filtered = quizDatabase.filter(q => q.category === category);
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
+
+  const questions = await dbGetQuestionsByCategory(category);
+  const shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
+export const getExamFromWeaknesses = async (weaknessIds: string[], count: number = 20): Promise<Question[]> => {
+  const db = await getDB();
+  const allKeys = await db.getAllKeys('questions');
+
+  if (allKeys.length === 0) {
+    // Fallback
+    const filtered = quizDatabase.filter(q => weaknessIds.includes(q.id));
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
+
+  const questions: Question[] = [];
+  const tx = db.transaction('questions', 'readonly');
+  const store = tx.objectStore('questions');
+  
+  for (const id of weaknessIds) {
+    const q = await store.get(id);
+    if (q) questions.push(q);
+  }
+
+  const shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
 };

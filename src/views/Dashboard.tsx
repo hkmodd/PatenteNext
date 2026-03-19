@@ -1,20 +1,70 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
-import { getRandomExam, quizDatabase } from '../data/questions';
+import { getRandomExam, getExamByCategory, getExamFromWeaknesses, quizDatabase } from '../data/questions';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { Play, Activity, CheckCircle2, XCircle, Download, Upload, Zap, BarChart2 } from 'lucide-react';
+import { Play, Activity, CheckCircle2, XCircle, Download, Upload, Zap, BarChart2, RefreshCw, BookOpen, Target } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { DatabaseSync } from '../components/DatabaseSync';
+import { TheoryModal } from '../components/TheoryModal';
+import { TrainingModal } from '../components/TrainingModal';
+import { MatrixModal } from '../components/MatrixModal';
+import { Cpu } from 'lucide-react';
 
 export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
-  const { totalExamsTaken, examsPassed, currentStreak, maxStreak, history, exportData, importData } = useAppStore();
+  const { totalExamsTaken, examsPassed, currentStreak, maxStreak, history, exportData, importData, weaknesses } = useAppStore();
+
+  const [isStarting, setIsStarting] = useState(false);
+  const [isTheoryOpen, setIsTheoryOpen] = useState(false);
+  const [isTrainingOpen, setIsTrainingOpen] = useState(false);
+  const [isMatrixOpen, setIsMatrixOpen] = useState(false);
+
+  const weaknessCount = Object.keys(weaknesses).length;
 
   const handleStart = async () => {
-    const newExam = await getRandomExam(30); // 30 questions for official exam
-    useAppStore.getState().startExam(newExam);
-    onStartQuiz();
+    if (isStarting) return;
+    setIsStarting(true);
+    try {
+      const newExam = await getRandomExam(30); // 30 questions for official exam
+      useAppStore.getState().startExam(newExam, false);
+      onStartQuiz();
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const handleStartCategory = async (category: string) => {
+    if (isStarting) return;
+    setIsStarting(true);
+    setIsTrainingOpen(false);
+    try {
+      const questions = await getExamByCategory(category, 20);
+      useAppStore.getState().startExam(questions, true);
+      onStartQuiz();
+    } catch (error) {
+      console.error("Failed to start category exam:", error);
+      alert("Errore durante la generazione dell'esame. Riprova.");
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const handleStartWeaknesses = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    setIsTrainingOpen(false);
+    try {
+      const weaknessIds = Object.keys(weaknesses);
+      const questions = await getExamFromWeaknesses(weaknessIds, 20);
+      useAppStore.getState().startExam(questions, true);
+      onStartQuiz();
+    } catch (error) {
+      console.error("Failed to start weakness exam:", error);
+      alert("Errore durante la generazione dell'esame. Riprova.");
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   const passRate = totalExamsTaken > 0 ? Math.round((examsPassed / totalExamsTaken) * 100) : 0;
@@ -131,7 +181,7 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
             
             <div className="space-y-4 z-10">
               <div className="inline-block px-3 py-1 border border-accent/30 bg-accent/10 text-accent font-mono text-xs font-bold uppercase tracking-widest mb-2 sm:mb-4">
-                Simulazione Ufficiale MIT
+                Simulazione Ufficiale MIT // 2026.1
               </div>
               <h2 className="text-fluid-hero font-display font-bold uppercase text-primary glitch" data-text="Domina L'Esame.">
                 Domina<br /><span className="text-accent">L'Esame.</span>
@@ -141,10 +191,26 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
               </p>
             </div>
 
-            <div className="mt-8 sm:mt-12 z-10">
-              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} aria-label="Inizia Simulazione">
-                <Play className="w-5 h-5 mr-3 fill-current" />
-                INIZIA SIMULAZIONE
+            <div className="mt-8 sm:mt-12 z-10 flex flex-col sm:flex-row flex-wrap gap-4">
+              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} disabled={isStarting} aria-label="Inizia Simulazione">
+                {isStarting ? (
+                  <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                ) : (
+                  <Play className="w-5 h-5 mr-3 fill-current" />
+                )}
+                {isStarting ? 'GENERAZIONE...' : 'SIMULAZIONE UFFICIALE'}
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTrainingOpen(true)} disabled={isStarting} aria-label="Training Mirato">
+                <Target className="w-5 h-5 mr-3" />
+                TRAINING MIRATO
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Manuale di Teoria">
+                <BookOpen className="w-5 h-5 mr-3" />
+                MANUALE TEORIA
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
+                <Cpu className="w-5 h-5 mr-3" />
+                CRACK THE MATRIX
               </Button>
             </div>
           </div>
@@ -285,6 +351,25 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
         </div>
 
       </main>
+
+      <TheoryModal 
+        isOpen={isTheoryOpen} 
+        onClose={() => setIsTheoryOpen(false)} 
+        categoryId={null} 
+      />
+
+      <TrainingModal
+        isOpen={isTrainingOpen}
+        onClose={() => setIsTrainingOpen(false)}
+        onStartCategory={handleStartCategory}
+        onStartWeaknesses={handleStartWeaknesses}
+        weaknessCount={weaknessCount}
+      />
+
+      <MatrixModal
+        isOpen={isMatrixOpen}
+        onClose={() => setIsMatrixOpen(false)}
+      />
     </motion.div>
   );
 }

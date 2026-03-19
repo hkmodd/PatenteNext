@@ -51,9 +51,9 @@ export function DatabaseSync() {
           <Database className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-display font-bold text-sm">Database Ministeriale</h3>
+          <h3 className="font-display font-bold text-sm">Database Ministeriale <span className="text-accent font-mono text-xs ml-1">v2026.1</span></h3>
           <p className="text-xs text-secondary font-mono">
-            {meta.totalQuestions ? `${meta.totalQuestions} quiz caricati` : 'Non sincronizzato'}
+            {meta.totalQuestions ? `${meta.totalQuestions} quiz caricati (Live Sync)` : 'Non sincronizzato'}
           </p>
         </div>
       </div>

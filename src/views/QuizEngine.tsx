@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Cpu, Zap } from 'lucide-react';
+import { matrixRules, wordAssociations } from '../data/matrix';
 
 export function QuizEngine({ onFinish }: { onFinish: () => void }) {
   const { currentExam, currentAnswers, answerQuestion, finishExam, examStartTime } = useAppStore();
@@ -10,21 +11,24 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes for Patente B
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMatrixHint, setShowMatrixHint] = useState(false);
 
   useEffect(() => {
     if (!examStartTime) return;
     
+    let timer: NodeJS.Timeout;
     const calculateTimeLeft = () => {
       const elapsedSeconds = Math.floor((Date.now() - examStartTime) / 1000);
       const remaining = Math.max(0, (20 * 60) - elapsedSeconds);
       setTimeLeft(remaining);
       if (remaining <= 0) {
+        clearInterval(timer);
         handleFinish(true);
       }
     };
 
     calculateTimeLeft(); // Initial calculation
-    const timer = setInterval(calculateTimeLeft, 1000);
+    timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, [examStartTime]);
 
@@ -39,6 +43,7 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
     setTimeout(() => {
       if (currentIndex < currentExam.length - 1) {
         setCurrentIndex(i => i + 1);
+        setShowMatrixHint(false);
       }
     }, 150);
   };
@@ -51,9 +56,9 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
     }
   };
 
-  const handleFinish = (force: boolean = false) => {
+  const handleFinish = async (force: boolean = false) => {
     setShowConfirmModal(false);
-    finishExam();
+    await finishExam();
     onFinish();
   };
 
@@ -64,6 +69,23 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
   };
 
   const progress = (Object.keys(currentAnswers).length / currentExam.length) * 100;
+
+  // Matrix Analysis for current question
+  const getMatrixAnalysis = () => {
+    if (!question) return { matchedRules: [], matchedAssoc: [] };
+    const text = question.text.toLowerCase();
+    const matchedRules = matrixRules.filter(rule => text.includes(rule.keyword.toLowerCase()));
+    
+    // Find word associations
+    const matchedAssoc = wordAssociations.filter(assoc => 
+      assoc.words.some(w => text.includes(w.toLowerCase()))
+    );
+
+    return { matchedRules, matchedAssoc };
+  };
+
+  const { matchedRules, matchedAssoc } = getMatrixAnalysis();
+  const hasMatrixHints = matchedRules.length > 0 || matchedAssoc.length > 0;
 
   return (
     <motion.div
@@ -78,6 +100,11 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
           <div className="font-mono text-xs sm:text-sm text-secondary font-bold uppercase tracking-widest">
             SEQ // <span className="text-primary">{String(currentIndex + 1).padStart(2, '0')}</span><span className="opacity-50">/{String(currentExam.length).padStart(2, '0')}</span>
           </div>
+          {useAppStore.getState().isCustomExam && (
+            <div className="hidden sm:flex font-mono text-[10px] text-accent font-bold uppercase tracking-widest items-center gap-1 bg-accent/10 px-2 py-1 rounded-sm">
+              TRAINING MIRATO
+            </div>
+          )}
         </div>
         <div className={`font-mono text-xl sm:text-2xl font-bold tracking-tighter ${timeLeft < 300 ? 'text-danger animate-pulse' : 'text-accent'}`}>
           {formatTime(timeLeft)}
@@ -109,6 +136,20 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
               <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-accent opacity-50 m-3 sm:m-4" />
               <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-accent opacity-50 m-3 sm:m-4" />
 
+              {hasMatrixHints && (
+                <div className="absolute top-4 right-4">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowMatrixHint(!showMatrixHint)}
+                    className={`transition-colors ${showMatrixHint ? 'text-accent bg-accent/10' : 'text-secondary hover:text-accent'}`}
+                    aria-label="Mostra suggerimento Matrix"
+                  >
+                    <Cpu className="w-5 h-5" />
+                  </Button>
+                </div>
+              )}
+
               {question.imageUrl && (
                 <div className="w-full max-w-[200px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-3 sm:p-4 border-2 sm:border-4 border-surface-border">
                   <img 
@@ -121,10 +162,53 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
                 </div>
               )}
               
-              <h2 className="text-fluid-h2 font-sans font-semibold leading-tight tracking-tight max-w-3xl text-primary">
+              <h2 className="text-fluid-h2 font-sans font-semibold leading-tight tracking-tight max-w-3xl text-primary mt-4">
                 {question.text}
               </h2>
             </div>
+
+            {/* Matrix Hint Panel */}
+            <AnimatePresence>
+              {showMatrixHint && hasMatrixHints && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border-x border-b border-accent/20 bg-accent/5 overflow-hidden"
+                >
+                  <div className="p-4 sm:p-6 space-y-4">
+                    <div className="flex items-center gap-2 text-accent font-mono text-sm font-bold uppercase tracking-widest mb-2">
+                      <Cpu className="w-4 h-4" />
+                      <span>Matrix Analysis</span>
+                    </div>
+                    
+                    {matchedRules.map(rule => (
+                      <div key={rule.id} className="flex items-start gap-3 p-3 border border-accent/20 bg-background/50">
+                        <div className={`shrink-0 px-2 py-1 text-xs font-mono font-bold border ${rule.probabilityTrue > 50 ? 'bg-success/10 text-success border-success/30' : 'bg-danger/10 text-danger border-danger/30'}`}>
+                          {rule.probabilityTrue}% VERO
+                        </div>
+                        <div>
+                          <span className="font-bold text-primary">"{rule.keyword}"</span>
+                          <p className="text-sm text-secondary mt-1">{rule.explanation}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {matchedAssoc.map((assoc, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 border border-accent/20 bg-background/50">
+                        <div className="shrink-0 px-2 py-1 text-xs font-mono font-bold border bg-accent/10 text-accent border-accent/30 flex items-center gap-1">
+                          <Zap className="w-3 h-3" /> ASSOCIAZIONE
+                        </div>
+                        <div>
+                          <span className="font-bold text-primary">{assoc.words.join(', ')}</span>
+                          <p className="text-sm text-secondary mt-1">→ {assoc.association}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Answer Buttons */}
             <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
@@ -160,7 +244,10 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
               return (
                 <button
                   key={q.id}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={() => {
+                    setCurrentIndex(idx);
+                    setShowMatrixHint(false);
+                  }}
                   className={`
                     h-8 sm:h-10 font-mono text-[10px] sm:text-xs font-bold transition-all border
                     ${isCurrent ? 'border-accent text-accent shadow-[0_0_10px_rgba(255,79,0,0.5)]' : 'border-surface-border'}
@@ -181,7 +268,10 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
         <footer className="mt-6 sm:mt-8 flex items-center justify-between border-t border-surface-border pt-4 sm:pt-6">
           <Button
             variant="ghost"
-            onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
+            onClick={() => {
+              setCurrentIndex(i => Math.max(0, i - 1));
+              setShowMatrixHint(false);
+            }}
             disabled={currentIndex === 0}
             className="gap-2 font-mono text-xs sm:text-sm"
             aria-label="Domanda precedente"
@@ -197,7 +287,10 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
 
           <Button
             variant="ghost"
-            onClick={() => setCurrentIndex(i => Math.min(currentExam.length - 1, i + 1))}
+            onClick={() => {
+              setCurrentIndex(i => Math.min(currentExam.length - 1, i + 1));
+              setShowMatrixHint(false);
+            }}
             disabled={currentIndex === currentExam.length - 1}
             className="gap-2 font-mono text-xs sm:text-sm"
             aria-label="Domanda successiva"

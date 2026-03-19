@@ -96,13 +96,19 @@ export async function getRandomQuestions(count: number): Promise<Question[]> {
 
   // Pick 1 from each available category first, then loop
   let catIndex = 0;
-  while (selectedQuestions.length < count && selectedQuestions.length < allQuestions.length) {
-    const cat = categories[catIndex % categories.length];
+  while (selectedQuestions.length < count && categories.length > 0) {
+    const currentCatIndex = catIndex % categories.length;
+    const cat = categories[currentCatIndex];
     const q = questionsByCategory[cat].pop();
+    
     if (q) {
       selectedQuestions.push(q);
+      catIndex++;
+    } else {
+      // Remove category if it has no more questions
+      categories.splice(currentCatIndex, 1);
+      // Do not increment catIndex, so the next iteration checks the new category at this index
     }
-    catIndex++;
   }
 
   // Shuffle the final selection

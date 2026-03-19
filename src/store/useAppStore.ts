@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Question } from '../data/questions';
+import { updateQuestionStats } from '../lib/db';
 
 export interface QuizSession {
   id: string;
@@ -19,17 +20,19 @@ interface AppState {
   currentStreak: number;
   maxStreak: number;
   history: QuizSession[];
+  weaknesses: Record<string, number>; // questionId -> number of times failed
   
   // Current Session
   currentExam: Question[] | null;
   currentAnswers: Record<string, boolean>;
   isExamActive: boolean;
   examStartTime: number | null;
+  isCustomExam: boolean; // True if it's a targeted training or error review
   
   // Actions
-  startExam: (questions: Question[]) => void;
+  startExam: (questions: Question[], isCustom?: boolean) => void;
   answerQuestion: (questionId: string, answer: boolean) => void;
-  finishExam: () => void;
+  finishExam: () => Promise<void>;
   clearHistory: () => void;
   importData: (data: string) => void;
   exportData: () => string;
@@ -43,17 +46,20 @@ export const useAppStore = create<AppState>()(
       currentStreak: 0,
       maxStreak: 0,
       history: [],
+      weaknesses: {},
       
       currentExam: null,
       currentAnswers: {},
       isExamActive: false,
       examStartTime: null,
+      isCustomExam: false,
       
-      startExam: (questions) => set({
+      startExam: (questions, isCustom = false) => set({
         currentExam: questions,
         currentAnswers: {},
         isExamActive: true,
-        examStartTime: Date.now()
+        examStartTime: Date.now(),
+        isCustomExam: isCustom
       }),
       
       answerQuestion: (questionId, answer) => set((state) => ({
@@ -63,23 +69,40 @@ export const useAppStore = create<AppState>()(
         }
       })),
       
-      finishExam: () => {
-        const { currentExam, currentAnswers, history, totalExamsTaken, examsPassed, currentStreak, maxStreak } = get();
+      finishExam: async () => {
+        const { currentExam, currentAnswers, history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses, isCustomExam } = get();
         if (!currentExam) return;
 
         let correctCount = 0;
+        const statsPromises: Promise<void>[] = [];
+        const newWeaknesses = { ...weaknesses };
+
         currentExam.forEach(q => {
-          if (currentAnswers[q.id] === q.answer) {
+          const isCorrect = currentAnswers[q.id] === q.answer;
+          if (isCorrect) {
             correctCount++;
+            // If answered correctly, reduce weakness score (min 0)
+            if (newWeaknesses[q.id]) {
+              newWeaknesses[q.id] = Math.max(0, newWeaknesses[q.id] - 1);
+              if (newWeaknesses[q.id] === 0) delete newWeaknesses[q.id];
+            }
+          } else {
+            // If answered incorrectly, increase weakness score
+            newWeaknesses[q.id] = (newWeaknesses[q.id] || 0) + 1;
           }
+          statsPromises.push(updateQuestionStats(q.id, isCorrect));
         });
+
+        // Wait for all stats to be updated
+        await Promise.all(statsPromises).catch(e => console.error("Failed to update stats", e));
 
         const errors = currentExam.length - correctCount;
         // Patente B rule: max 3 errors to pass (out of 30)
-        const maxAllowedErrors = 3;
-        const passed = errors <= maxAllowedErrors;
+        const maxAllowedErrors = Math.floor(currentExam.length * 0.1); // 10% error margin for custom exams
+        const passed = errors <= (isCustomExam ? maxAllowedErrors : 3);
 
-        const newStreak = passed ? currentStreak + 1 : 0;
+        // Only update streaks and total counts if it's an official exam simulation (not custom)
+        const newStreak = (!isCustomExam && passed) ? currentStreak + 1 : (!isCustomExam ? 0 : currentStreak);
         const newMaxStreak = Math.max(maxStreak, newStreak);
 
         const session: QuizSession = {
@@ -94,16 +117,17 @@ export const useAppStore = create<AppState>()(
 
         set({
           history: [session, ...history],
-          totalExamsTaken: totalExamsTaken + 1,
-          examsPassed: passed ? examsPassed + 1 : examsPassed,
+          totalExamsTaken: isCustomExam ? totalExamsTaken : totalExamsTaken + 1,
+          examsPassed: (passed && !isCustomExam) ? examsPassed + 1 : examsPassed,
           currentStreak: newStreak,
           maxStreak: newMaxStreak,
+          weaknesses: newWeaknesses,
           isExamActive: false,
           // Keep currentExam and currentAnswers to show results
         });
       },
       
-      clearHistory: () => set({ history: [], totalExamsTaken: 0, examsPassed: 0, currentStreak: 0, maxStreak: 0 }),
+      clearHistory: () => set({ history: [], totalExamsTaken: 0, examsPassed: 0, currentStreak: 0, maxStreak: 0, weaknesses: {} }),
       
       importData: (dataStr) => {
         try {
@@ -114,7 +138,8 @@ export const useAppStore = create<AppState>()(
               totalExamsTaken: data.totalExamsTaken || 0,
               examsPassed: data.examsPassed || 0,
               currentStreak: data.currentStreak || 0,
-              maxStreak: data.maxStreak || 0
+              maxStreak: data.maxStreak || 0,
+              weaknesses: data.weaknesses || {}
             });
           }
         } catch (e) {
@@ -123,8 +148,8 @@ export const useAppStore = create<AppState>()(
       },
       
       exportData: () => {
-        const { history, totalExamsTaken, examsPassed, currentStreak, maxStreak } = get();
-        return JSON.stringify({ history, totalExamsTaken, examsPassed, currentStreak, maxStreak });
+        const { history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses } = get();
+        return JSON.stringify({ history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses });
       }
     }),
     {
@@ -135,10 +160,12 @@ export const useAppStore = create<AppState>()(
         examsPassed: state.examsPassed,
         currentStreak: state.currentStreak,
         maxStreak: state.maxStreak,
+        weaknesses: state.weaknesses,
         currentExam: state.currentExam,
         currentAnswers: state.currentAnswers,
         isExamActive: state.isExamActive,
-        examStartTime: state.examStartTime
+        examStartTime: state.examStartTime,
+        isCustomExam: state.isCustomExam
       }),
     }
   )

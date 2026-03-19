@@ -1,16 +1,29 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
-import { CheckCircle2, XCircle, Home, AlertTriangle, Flame } from 'lucide-react';
+import { CheckCircle2, XCircle, Home, AlertTriangle, Flame, BookOpen, Brain, Cpu, Zap } from 'lucide-react';
+import { TheoryModal } from '../components/TheoryModal';
+import { matrixRules, wordAssociations } from '../data/matrix';
 
 export function Results({ onHome }: { onHome: () => void }) {
-  const { history, currentExam, currentStreak } = useAppStore();
+  const { history, currentExam, currentStreak, weaknesses } = useAppStore();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [expandedMatrix, setExpandedMatrix] = useState<string | null>(null);
   
   if (history.length === 0 || !currentExam) return null;
-  
+
   const lastSession = history[0];
   const errors = lastSession.total - lastSession.score;
+
+  const getMatrixAnalysis = (text: string) => {
+    const lowerText = text.toLowerCase();
+    const matchedRules = matrixRules.filter(rule => lowerText.includes(rule.keyword.toLowerCase()));
+    const matchedAssoc = wordAssociations.filter(assoc => 
+      assoc.words.some(w => lowerText.includes(w.toLowerCase()))
+    );
+    return { matchedRules, matchedAssoc };
+  };
 
   return (
     <motion.div
@@ -80,6 +93,10 @@ export function Results({ onHome }: { onHome: () => void }) {
                 const isCorrect = userAnswer === q.answer;
                 
                 if (isCorrect) return null;
+
+                const { matchedRules, matchedAssoc } = getMatrixAnalysis(q.text);
+                const hasMatrixHints = matchedRules.length > 0 || matchedAssoc.length > 0;
+                const isMatrixExpanded = expandedMatrix === q.id;
                 
                 return (
                   <div key={q.id} className="border border-danger/30 bg-surface/80 backdrop-blur-sm p-4 sm:p-8 relative">
@@ -87,13 +104,68 @@ export function Results({ onHome }: { onHome: () => void }) {
                     
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                       <div className="flex-1 space-y-3 sm:space-y-4">
-                        <div className="font-mono text-[10px] sm:text-xs text-danger font-bold uppercase tracking-widest flex items-center gap-2">
-                          <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
-                          Errore // Domanda {String(idx + 1).padStart(2, '0')}
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="font-mono text-[10px] sm:text-xs text-danger font-bold uppercase tracking-widest flex items-center gap-2">
+                            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            Errore // Domanda {String(idx + 1).padStart(2, '0')}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {weaknesses[q.id] > 0 && (
+                              <div className="font-mono text-[10px] sm:text-xs text-accent font-bold uppercase tracking-widest flex items-center gap-1 bg-accent/10 px-2 py-1 rounded-sm">
+                                <Brain className="w-3 h-3" />
+                                Livello Debolezza: {weaknesses[q.id]}
+                              </div>
+                            )}
+                            {hasMatrixHints && (
+                              <button
+                                onClick={() => setExpandedMatrix(isMatrixExpanded ? null : q.id)}
+                                className={`font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center gap-1 px-2 py-1 rounded-sm transition-colors ${isMatrixExpanded ? 'bg-accent/20 text-accent border border-accent/50' : 'bg-accent/5 text-accent/70 border border-accent/20 hover:bg-accent/10 hover:text-accent'}`}
+                              >
+                                <Cpu className="w-3 h-3" />
+                                Matrix Analysis
+                              </button>
+                            )}
+                          </div>
                         </div>
                         
                         <p className="text-lg sm:text-xl font-sans font-medium leading-snug text-primary">{q.text}</p>
                         
+                        <AnimatePresence>
+                          {isMatrixExpanded && hasMatrixHints && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="p-3 sm:p-4 border border-accent/20 bg-accent/5 space-y-3 mt-2">
+                                {matchedRules.map(rule => (
+                                  <div key={rule.id} className="flex items-start gap-3">
+                                    <div className={`shrink-0 px-2 py-1 text-[10px] font-mono font-bold border ${rule.probabilityTrue > 50 ? 'bg-success/10 text-success border-success/30' : 'bg-danger/10 text-danger border-danger/30'}`}>
+                                      {rule.probabilityTrue}% VERO
+                                    </div>
+                                    <div>
+                                      <span className="font-bold text-primary text-sm">"{rule.keyword}"</span>
+                                      <p className="text-xs text-secondary mt-0.5">{rule.explanation}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                                {matchedAssoc.map((assoc, i) => (
+                                  <div key={i} className="flex items-start gap-3">
+                                    <div className="shrink-0 px-2 py-1 text-[10px] font-mono font-bold border bg-accent/10 text-accent border-accent/30 flex items-center gap-1">
+                                      <Zap className="w-3 h-3" /> ASSOCIAZIONE
+                                    </div>
+                                    <div>
+                                      <span className="font-bold text-primary text-sm">{assoc.words.join(', ')}</span>
+                                      <p className="text-xs text-secondary mt-0.5">→ {assoc.association}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
                         <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 sm:pt-4 font-mono text-xs sm:text-sm">
                           <div className="flex flex-col">
                             <span className="text-secondary mb-1">Tua risposta</span>
@@ -107,12 +179,22 @@ export function Results({ onHome }: { onHome: () => void }) {
                           </div>
                         </div>
 
-                        {q.explanation && (
-                          <div className="mt-4 sm:mt-6 p-3 sm:p-4 border border-surface-border bg-background/50 font-sans text-sm text-secondary leading-relaxed">
-                            <span className="text-accent font-mono font-bold block mb-1 sm:mb-2 uppercase tracking-wider text-xs">Spiegazione</span>
-                            {q.explanation}
-                          </div>
-                        )}
+                        <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3">
+                          {q.explanation && (
+                            <div className="flex-1 p-3 sm:p-4 border border-surface-border bg-background/50 font-sans text-sm text-secondary leading-relaxed">
+                              <span className="text-accent font-mono font-bold block mb-1 sm:mb-2 uppercase tracking-wider text-xs">Spiegazione</span>
+                              {q.explanation}
+                            </div>
+                          )}
+                          <Button 
+                            variant="secondary" 
+                            className="shrink-0 gap-2 h-auto py-3 sm:py-4"
+                            onClick={() => setSelectedCategory(q.category)}
+                          >
+                            <BookOpen className="w-4 h-4 text-accent" />
+                            STUDIA TEORIA
+                          </Button>
+                        </div>
                       </div>
 
                       {q.imageUrl && (
@@ -128,6 +210,12 @@ export function Results({ onHome }: { onHome: () => void }) {
           )}
         </div>
       </main>
+
+      <TheoryModal 
+        isOpen={selectedCategory !== null} 
+        onClose={() => setSelectedCategory(null)} 
+        categoryId={selectedCategory} 
+      />
     </motion.div>
   );
 }
