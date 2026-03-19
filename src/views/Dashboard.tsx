@@ -22,6 +22,30 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
 
   const weaknessCount = Object.keys(weaknesses).length;
 
+  // Calculate Readiness Index
+  const calculateReadiness = () => {
+    if (totalExamsTaken === 0) return 0;
+    
+    // 1. Pass Rate (40%)
+    const passRate = (examsPassed / totalExamsTaken) * 100;
+    
+    // 2. Recent Performance (40%)
+    const recentExams = history.slice(0, 5);
+    const recentScoreAvg = recentExams.length > 0 
+      ? (recentExams.reduce((acc, exam) => acc + exam.score, 0) / (recentExams.length * 30)) * 100 
+      : 0;
+      
+    // 3. Weakness Resolution (20%)
+    // Assuming a baseline of 100 questions for simplicity, or just penalize based on count
+    const weaknessPenalty = Math.min(weaknessCount * 2, 100);
+    const weaknessScore = 100 - weaknessPenalty;
+
+    const readiness = (passRate * 0.4) + (recentScoreAvg * 0.4) + (weaknessScore * 0.2);
+    return Math.round(Math.max(0, Math.min(100, readiness)));
+  };
+
+  const readinessIndex = calculateReadiness();
+
   const handleStart = async () => {
     if (isStarting) return;
     setIsStarting(true);
@@ -103,7 +127,10 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
 
     const stats: Record<string, { total: number; correct: number }> = {};
 
-    history.forEach(session => {
+    // Limit to last 50 exams for performance and relevance
+    const recentHistory = history.slice(0, 50);
+
+    recentHistory.forEach(session => {
       // For backward compatibility, if session.exam is not present, use quizDatabase
       const examQuestions = session.exam || quizDatabase;
       
@@ -121,7 +148,7 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
     });
 
     return Object.entries(stats).map(([category, data]) => ({
-      subject: category.replace(/_/g, ' ').toUpperCase(),
+      subject: category.replace(/-/g, ' ').toUpperCase(),
       A: Math.round((data.correct / data.total) * 100),
       fullMark: 100,
     })).sort((a, b) => b.A - a.A).slice(0, 6); // Top 6 categories for the radar chart
@@ -131,8 +158,9 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
   const progressionData = useMemo(() => {
     if (history.length === 0) return [];
     
-    // Reverse history to show chronological order (oldest to newest)
-    const sortedHistory = [...history].reverse();
+    // Reverse recent history to show chronological order (oldest to newest)
+    const recentHistory = history.slice(0, 20); // Only show last 20 for the chart
+    const sortedHistory = [...recentHistory].reverse();
     
     return sortedHistory.map((session, index) => ({
       name: `Esame ${index + 1}`,
@@ -173,45 +201,113 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
           
           <DatabaseSync />
 
-          {/* Hero Section */}
-          <div className="relative overflow-hidden border border-surface-border bg-surface p-6 sm:p-12 flex flex-col justify-between min-h-[350px] sm:min-h-[450px]">
-            <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-              <Zap className="w-96 h-96 text-accent" />
-            </div>
-            
-            <div className="space-y-4 z-10">
-              <div className="inline-block px-3 py-1 border border-accent/30 bg-accent/10 text-accent font-mono text-xs font-bold uppercase tracking-widest mb-2 sm:mb-4">
-                Simulazione Ufficiale MIT // 2026.1
+          {/* Main Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="lg:col-span-2 border border-surface-border bg-surface/50 p-6 sm:p-12 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-accent/10" />
+              
+              <div className="relative z-10 max-w-xl">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-6 rounded-sm"
+                >
+                  <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Database Ministeriale 2026 (100% Copertura)
+                </motion.div>
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-fluid-hero font-display font-bold uppercase tracking-tighter leading-[0.85] mb-6 sm:mb-8 glitch" data-text="PATENTE B"
+                >
+                  PATENTE B<br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
+                    SIMULATORE
+                  </span>
+                </motion.h1>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="font-mono text-sm sm:text-base text-secondary leading-relaxed"
+                >
+                  Seleziona il modulo di addestramento. La simulazione ufficiale replica le condizioni esatte dell'esame ministeriale.
+                </motion.p>
               </div>
-              <h2 className="text-fluid-hero font-display font-bold uppercase text-primary glitch" data-text="Domina L'Esame.">
-                Domina<br /><span className="text-accent">L'Esame.</span>
-              </h2>
-              <p className="text-secondary font-sans text-sm sm:text-base max-w-md mt-4 sm:mt-6 leading-relaxed">
-                Algoritmo di simulazione ad alta fedeltà. 30 domande, tolleranza 3 errori. Nessuna distrazione, solo performance.
-              </p>
+
+              <div className="mt-8 sm:mt-12 z-10 flex flex-col sm:flex-row flex-wrap gap-4">
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} disabled={isStarting} aria-label="Inizia Simulazione">
+                  {isStarting ? (
+                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                  ) : (
+                    <Play className="w-5 h-5 mr-3 fill-current" />
+                  )}
+                  {isStarting ? 'GENERAZIONE...' : 'SIMULAZIONE UFFICIALE'}
+                </Button>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTrainingOpen(true)} disabled={isStarting} aria-label="Training Mirato">
+                  <Target className="w-5 h-5 mr-3" />
+                  TRAINING MIRATO
+                </Button>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Manuale di Teoria">
+                  <BookOpen className="w-5 h-5 mr-3" />
+                  MANUALE TEORIA
+                </Button>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
+                  <Cpu className="w-5 h-5 mr-3" />
+                  CRACK THE MATRIX
+                </Button>
+              </div>
             </div>
 
-            <div className="mt-8 sm:mt-12 z-10 flex flex-col sm:flex-row flex-wrap gap-4">
-              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} disabled={isStarting} aria-label="Inizia Simulazione">
-                {isStarting ? (
-                  <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
-                ) : (
-                  <Play className="w-5 h-5 mr-3 fill-current" />
-                )}
-                {isStarting ? 'GENERAZIONE...' : 'SIMULAZIONE UFFICIALE'}
-              </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTrainingOpen(true)} disabled={isStarting} aria-label="Training Mirato">
-                <Target className="w-5 h-5 mr-3" />
-                TRAINING MIRATO
-              </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Manuale di Teoria">
-                <BookOpen className="w-5 h-5 mr-3" />
-                MANUALE TEORIA
-              </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
-                <Cpu className="w-5 h-5 mr-3" />
-                CRACK THE MATRIX
-              </Button>
+            {/* Readiness Index */}
+            <div className="border border-surface-border bg-surface/80 p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-danger via-warning to-success opacity-50" />
+              
+              <div className="flex items-center gap-2 text-secondary font-mono text-xs font-bold uppercase tracking-widest mb-6">
+                <Activity className="w-4 h-4" />
+                Indice di Prontezza
+              </div>
+
+              <div className="relative flex items-center justify-center">
+                <svg className="w-32 h-32 transform -rotate-90">
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-surface-border"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray={351.8}
+                    strokeDashoffset={351.8 - (351.8 * readinessIndex) / 100}
+                    className={`transition-all duration-1000 ease-out ${
+                      readinessIndex >= 90 ? 'text-success' : 
+                      readinessIndex >= 70 ? 'text-warning' : 
+                      'text-danger'
+                    }`}
+                  />
+                </svg>
+                <div className="absolute flex flex-col items-center justify-center">
+                  <span className="font-display font-bold text-4xl text-primary">
+                    {readinessIndex}%
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-6 text-center font-mono text-xs text-secondary leading-relaxed">
+                {readinessIndex >= 90 ? 'Pronto per l\'esame. Mantieni il ritmo.' :
+                 readinessIndex >= 70 ? 'Buon livello. Concentrati sugli errori frequenti.' :
+                 'Addestramento insufficiente. Richiesta simulazione intensiva.'}
+              </p>
             </div>
           </div>
 

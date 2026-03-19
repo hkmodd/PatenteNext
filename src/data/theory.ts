@@ -7,14 +7,14 @@ export interface TrickQuestion {
 }
 
 export interface TheorySection {
-  id: string; // Unique ID for deep linking and analytics
+  id: string;
   subtitle: string;
   paragraphs: string[];
-  alerts?: string[]; // Per note critiche, es. "Ritiro Patente" o "Errore Comune"
-  images?: string[]; // Array di URL immagini (es. segnali stradali)
-  trickQuestions?: TrickQuestion[]; // Domande trabocchetto ministeriali
-  mnemonics?: string[]; // Regole mnemoniche per la memorizzazione rapida
-  relatedQuizIds?: string[]; // ID dei quiz correlati per cross-referencing
+  alerts?: string[];
+  images?: string[];
+  trickQuestions?: TrickQuestion[];
+  mnemonics?: string[];
+  relatedQuizIds?: string[];
 }
 
 export interface TheoryChapter {
@@ -27,230 +27,501 @@ export interface TheoryChapter {
 }
 
 export const theoryManual: Record<string, TheoryChapter> = {
-  'precedenza-incroci': {
-    id: 'precedenza-incroci',
-    title: 'Precedenza agli Incroci',
-    description: 'Le regole fondamentali per stabilire l\'ordine di transito nelle intersezioni. Un errore qui è fatale sia all\'esame che nella realtà.',
-    difficulty: 'CRITICAL',
-    tags: ['incroci', 'precedenza', 'svolta', 'tram', 'emergenza'],
+  'definizioni-generali-doveri-strada': {
+    id: 'definizioni-generali-doveri-strada',
+    title: '1. Definizioni Generali e Doveri',
+    description: 'Classificazione delle strade, parti della strada e classificazione dei veicoli.',
+    difficulty: 'EASY',
+    tags: ['carreggiata', 'corsia', 'veicoli', 'autostrada'],
     sections: [
       {
-        id: 'regola-generale',
-        subtitle: 'La Regola Generale (Precedenza a Destra)',
+        id: 'strada-carreggiata-corsia',
+        subtitle: 'Strada, Carreggiata e Corsia',
         paragraphs: [
-          'Quando due veicoli stanno per impegnare un incrocio, o le loro traiettorie stanno comunque per intersecarsi, si ha l\'obbligo di dare la precedenza a chi proviene da DESTRA, salvo diversa segnalazione.',
-          'Questa regola vale sempre negli incroci non segnalati (privi di cartelli, semafori o vigili).'
+          'La STRADA è l\'area ad uso pubblico destinata alla circolazione dei pedoni, dei veicoli e degli animali. Comprende carreggiate, banchine, marciapiedi e piste ciclabili.',
+          'La CARREGGIATA è la parte della strada destinata al transito dei veicoli. È composta da una o più corsie di marcia. NON comprende i marciapiedi, le banchine o le piste ciclabili.',
+          'La CORSIA è una parte longitudinale della carreggiata, di larghezza idonea a consentire il transito di una sola fila di veicoli.'
         ],
         alerts: [
-          'ATTENZIONE: Dare la precedenza a destra NON significa passare senza guardare a sinistra. Bisogna sempre usare la massima prudenza e assicurarsi che chi arriva da sinistra ci stia effettivamente concedendo la precedenza.'
+          'ATTENZIONE: La carreggiata NON comprende le banchine e i marciapiedi. La strada invece comprende tutto.'
         ],
         trickQuestions: [
           {
-            question: 'Negli incroci non segnalati, ha la precedenza il veicolo che marcia a velocità più elevata.',
+            question: 'La carreggiata comprende le piazzole di sosta.',
             isTrue: false,
-            explanation: 'Falso. La velocità non conferisce MAI il diritto di precedenza. Vale sempre la regola della precedenza a destra.'
-          },
-          {
-            question: 'Si ha l\'obbligo di dare la precedenza a destra e a sinistra in presenza del segnale DARE PRECEDENZA.',
-            isTrue: true,
-            explanation: 'Vero. Il segnale a triangolo rovesciato impone di dare precedenza in entrambi i sensi.'
+            explanation: 'Falso. Le piazzole di sosta sono fuori dalla carreggiata.'
           }
-        ]
-      },
-      {
-        id: 'eccezioni-assolute',
-        subtitle: 'Eccezioni Assolute (Chi passa sempre)',
-        paragraphs: [
-          'Esistono dei veicoli che, per la loro natura o funzione, godono della precedenza assoluta su tutti gli altri, indipendentemente dalla loro provenienza (destra o sinistra).',
-          'I veicoli su rotaia (TRAM e TRENI) hanno sempre la precedenza, a meno che non ci sia un semaforo rosso o un segnale di STOP a fermarli.',
-          'I veicoli in servizio di emergenza (Ambulanze, Polizia, Vigili del Fuoco) hanno la precedenza assoluta SOLO SE hanno la sirena spiegata e il lampeggiante blu acceso.'
-        ],
-        mnemonics: [
-          'TRAM = Rotaie = Precedenza assoluta (tranne col rosso/stop).',
-          'AMBULANZA = Sirena + Lampeggiante = Precedenza assoluta. Se spenti = Veicolo normale.'
-        ],
-        trickQuestions: [
-          {
-            question: 'Il tram ha sempre la precedenza, anche in presenza del semaforo rosso.',
-            isTrue: false,
-            explanation: 'Falso. Il tram deve rispettare i semafori e le segnalazioni dei vigili.'
-          },
-          {
-            question: 'Un\'ambulanza ha sempre la precedenza, anche se non ha in funzione la sirena.',
-            isTrue: false,
-            explanation: 'Falso. Senza sirena e lampeggiante blu accesi, l\'ambulanza è soggetta alle normali regole di precedenza.'
-          }
-        ]
-      },
-      {
-        id: 'svolta-sinistra',
-        subtitle: 'Svolta a Sinistra',
-        paragraphs: [
-          'Quando si svolta a sinistra, si taglia la strada ai veicoli che provengono di fronte e da destra.',
-          'Pertanto, chi svolta a sinistra deve dare la precedenza a:',
-          '1. Chi proviene da destra.',
-          '2. Chi proviene di fronte (che va dritto o svolta a sua volta a destra).',
-          '3. I pedoni che attraversano la strada in cui ci si sta immettendo.'
-        ],
-        mnemonics: [
-          'Chi svolta a SINISTRA, aspetta (quasi) TUTTI: Destra, Fronte e Pedoni.'
-        ]
-      },
-      {
-        id: 'immissione-flusso',
-        subtitle: 'Immissione nel Flusso della Circolazione',
-        paragraphs: [
-          'Chi si immette nel flusso della circolazione (es. uscendo da un parcheggio, da un passo carrabile, da una strada privata o da un sentiero sterrato) deve dare la precedenza a TUTTI i veicoli in transito, sia da destra che da sinistra.'
-        ]
-      }
-    ]
-  },
-  'limiti-di-velocita': {
-    id: 'limiti-di-velocita',
-    title: 'Limiti di Velocità e Pericoli',
-    description: 'I limiti massimi consentiti dal Codice della Strada in base al tipo di veicolo, alla strada e all\'esperienza del conducente.',
-    difficulty: 'HARD',
-    tags: ['velocità', 'limiti', 'autostrada', 'neopatentati', 'meteo'],
-    sections: [
-      {
-        id: 'limiti-generali',
-        subtitle: 'Limiti Generali per Autovetture (Patente B)',
-        paragraphs: [
-          'I limiti massimi di velocità per le autovetture (fino a 3.5t) in condizioni normali sono:',
-          '• Centri abitati (strade urbane): 50 km/h (elevabili a 70 km/h solo in strade urbane di scorrimento con apposito segnale).',
-          '• Strade extraurbane secondarie (statali, provinciali a 1 corsia per senso): 90 km/h.',
-          '• Strade extraurbane principali (superstrade a carreggiate separate): 110 km/h.',
-          '• Autostrade: 130 km/h (elevabili a 150 km/h solo su tratte a 3 corsie con tutor e asfalto drenante, se segnalato).'
-        ]
-      },
-      {
-        id: 'condizioni-meteo',
-        subtitle: 'Condizioni Meteorologiche Avverse',
-        paragraphs: [
-          'In caso di precipitazioni atmosferiche (pioggia, grandine), i limiti massimi si abbassano automaticamente, anche in assenza di cartelli specifici:',
-          '• Autostrade: scende da 130 a 110 km/h.',
-          '• Strade extraurbane principali: scende da 110 a 90 km/h.',
-          'In caso di nebbia fitta (visibilità inferiore a 100 metri), il limite massimo può essere abbassato a 50 km/h se segnalato dall\'apposito pannello luminoso.'
-        ],
-        alerts: [
-          'ERRORE COMUNE: La pioggia non abbassa il limite sulle strade extraurbane secondarie (rimane 90 km/h) né nei centri abitati (rimane 50 km/h).'
-        ],
-        trickQuestions: [
-          {
-            question: 'In caso di pioggia, il limite massimo di velocità sulle strade extraurbane secondarie scende a 70 km/h.',
-            isTrue: false,
-            explanation: 'Falso. Sulle strade extraurbane secondarie il limite rimane 90 km/h anche in caso di pioggia.'
-          }
-        ]
-      },
-      {
-        id: 'limiti-neopatentati',
-        subtitle: 'Limiti per Neopatentati',
-        paragraphs: [
-          'Per i primi 3 anni dal conseguimento della Patente B, si è considerati "Neopatentati".',
-          'I limiti massimi sono più restrittivi:',
-          '• Autostrade: massimo 100 km/h (invece di 130).',
-          '• Strade extraurbane principali: massimo 90 km/h (invece di 110).'
-        ],
-        alerts: [
-          'RITIRO PATENTE: Superare i limiti di velocità di oltre 40 km/h comporta la sospensione della patente. Per i neopatentati, i punti decurtati per ogni infrazione sono RADDOPPIATI.'
-        ]
-      }
-    ]
-  },
-  'patente-punti-documenti': {
-    id: 'patente-punti-documenti',
-    title: 'Patenti, Punti e Documenti',
-    description: 'Classificazione delle patenti, validità, sistema a punti e documenti obbligatori a bordo.',
-    difficulty: 'MEDIUM',
-    tags: ['patente', 'punti', 'documenti', 'rinnovo', 'sospensione'],
-    sections: [
-      {
-        id: 'veicoli-patente-b',
-        subtitle: 'Cosa si può guidare con la Patente B',
-        paragraphs: [
-          'La Patente B consente di guidare:',
-          '• Autovetture (fino a 9 posti totali, compreso il conducente).',
-          '• Autocarri con massa massima autorizzata non superiore a 3,5 tonnellate.',
-          '• Macchine agricole (TUTTE, anche quelle eccezionali).',
-          '• Macchine operatrici (SOLO quelle NON eccezionali).',
-          '• Motocicli fino a 125 cm3 e 11 kW di potenza (SOLO in Italia).',
-          '• Tricicli a motore (se di potenza > 15 kW, solo dopo aver compiuto 21 anni e solo in Italia).'
-        ]
-      },
-      {
-        id: 'rinnovo-validita',
-        subtitle: 'Rinnovo e Validità',
-        paragraphs: [
-          'La Patente B deve essere rinnovata periodicamente tramite visita medica per accertare i requisiti fisici e psichici:',
-          '• Ogni 10 anni fino al compimento dei 50 anni di età.',
-          '• Ogni 5 anni tra i 50 e i 70 anni.',
-          '• Ogni 3 anni tra i 70 e gli 80 anni.',
-          '• Ogni 2 anni dopo gli 80 anni.'
-        ]
-      },
-      {
-        id: 'sistema-punti',
-        subtitle: 'Il Sistema a Punti',
-        paragraphs: [
-          'Ogni patente ha un saldo iniziale di 20 punti.',
-          'Se non si commettono infrazioni che comportano la perdita di punti per 2 anni consecutivi, si guadagnano 2 punti (fino a un massimo di 30 punti).',
-          'I neopatentati (primi 3 anni) guadagnano 1 punto bonus all\'anno se non commettono infrazioni, ma subiscono la decurtazione DOPPIA dei punti in caso di infrazione.'
-        ],
-        alerts: [
-          'Se si esauriscono tutti i punti (saldo zero), scatta la REVISIONE della patente: bisogna rifare l\'esame di teoria e l\'esame di pratica entro 30 giorni.'
         ]
       }
     ]
   },
   'segnali-pericolo': {
     id: 'segnali-pericolo',
-    title: 'Segnali di Pericolo',
+    title: '2. Segnali di Pericolo',
     description: 'Preannunciano situazioni di pericolo, richiedendo di moderare la velocità.',
-    difficulty: 'EASY',
-    tags: ['segnali', 'pericolo', 'triangoli', '150m'],
+    difficulty: 'MEDIUM',
+    tags: ['pericolo', 'triangoli', '150m'],
     sections: [
       {
-        id: 'caratteristiche-generali',
-        subtitle: 'Caratteristiche Generali',
+        id: 'regole-pericolo',
+        subtitle: 'Regole Generali',
         paragraphs: [
-          'I segnali di pericolo hanno forma triangolare con un vertice rivolto verso l\'alto, bordo rosso e sfondo bianco (giallo se si tratta di cantieri stradali).',
-          'Di norma, sono posti a 150 metri prima del pericolo che segnalano, per dare il tempo al conducente di rallentare.'
-        ]
-      },
-      {
-        id: 'cunetta-dosso',
-        subtitle: 'Cunetta e Dosso',
-        paragraphs: [
-          'CUNETTA: Preannuncia un tratto di strada in discesa seguito da una salita (una "buca" o avvallamento). Può accumulare acqua in caso di pioggia (rischio aquaplaning).',
-          'DOSSO: Preannuncia un tratto di strada in salita seguito da una discesa. La visibilità è limitata.'
+          'I segnali di pericolo hanno forma triangolare con vertice verso l\'alto, bordo rosso e sfondo bianco.',
+          'Sono posti di norma a 150 metri prima del pericolo.'
         ],
-        alerts: [
-          'DIVIETI SUL DOSSO: È vietato il sorpasso sul tratto in salita (se la strada è a doppio senso con due sole corsie), ed è sempre vietata l\'inversione di marcia, la sosta e la fermata.'
-        ],
-        relatedQuizIds: ['q_001']
+        mnemonics: ['Tutti i segnali di pericolo si trovano a 150 metri, tranne la Croce di S. Andrea (immediatamente prima del binario).']
       }
     ]
   },
-  // Placeholder per le altre categorie (saranno espanse dal sistema di scraping)
-  'definizioni-generali-doveri-strada': {
-    id: 'definizioni-generali-doveri-strada',
-    title: 'Definizioni Generali e Doveri',
-    description: 'Classificazione dei veicoli e definizioni stradali.',
-    difficulty: 'EASY',
-    tags: ['definizioni', 'strada', 'carreggiata', 'corsia'],
+  'segnali-divieto': {
+    id: 'segnali-divieto',
+    title: '3. Segnali di Divieto',
+    description: 'Vietano il transito, determinate manovre o impongono limiti.',
+    difficulty: 'MEDIUM',
+    tags: ['divieto', 'tondi', 'rosso'],
     sections: [
       {
-        id: 'strada-parti',
-        subtitle: 'La Strada e le sue parti',
+        id: 'divieto-transito-sosta',
+        subtitle: 'Divieti di Transito e Sosta',
         paragraphs: [
-          'La strada comprende carreggiate, banchine, marciapiedi e piste ciclabili.',
-          'La carreggiata è la parte destinata al transito dei veicoli (esclude marciapiedi e banchine).'
+          'Hanno forma circolare con bordo rosso e sfondo bianco.',
+          'Il Divieto di Transito (cerchio bianco con bordo rosso) vieta la circolazione in entrambi i sensi a TUTTI i veicoli.',
+          'Il Senso Vietato (disco rosso con barra bianca orizzontale) vieta di entrare in quella strada, ma i veicoli possono provenire dal senso opposto.'
+        ]
+      }
+    ]
+  },
+  'segnali-obbligo': {
+    id: 'segnali-obbligo',
+    title: '4. Segnali di Obbligo',
+    description: 'Impongono un comportamento specifico, come direzioni obbligatorie o limiti minimi.',
+    difficulty: 'EASY',
+    tags: ['obbligo', 'tondi', 'blu'],
+    sections: [
+      {
+        id: 'direzioni-obbligatorie',
+        subtitle: 'Direzioni Obbligatorie',
+        paragraphs: [
+          'Hanno forma circolare con sfondo blu e simbolo bianco.',
+          'Indicano l\'unica direzione consentita o le uniche direzioni consentite.'
+        ]
+      }
+    ]
+  },
+  'segnali-precedenza': {
+    id: 'segnali-precedenza',
+    title: '5. Segnali di Precedenza',
+    description: 'Regolano il diritto di precedenza agli incroci e nei sensi unici alternati.',
+    difficulty: 'CRITICAL',
+    tags: ['precedenza', 'stop', 'incroci'],
+    sections: [
+      {
+        id: 'dare-precedenza-stop',
+        subtitle: 'Dare Precedenza e STOP',
+        paragraphs: [
+          'DARE PRECEDENZA (triangolo rovesciato): Obbliga a dare la precedenza a destra e a sinistra. Non c\'è l\'obbligo di fermarsi se non arriva nessuno.',
+          'STOP (ottagono rosso): Obbliga a FERMARSI SEMPRE in corrispondenza della striscia trasversale, anche se non c\'è nessuno, e dare precedenza a destra e sinistra.'
+        ],
+        alerts: ['RITIRO PATENTE: Non fermarsi allo STOP comporta sanzioni gravissime e decurtazione di 6 punti (12 per neopatentati).']
+      }
+    ]
+  },
+  'segnaletica-orizzontale-ostacoli': {
+    id: 'segnaletica-orizzontale-ostacoli',
+    title: '6. Segnaletica Orizzontale e Ostacoli',
+    description: 'Strisce, scritte e simboli tracciati sulla pavimentazione stradale.',
+    difficulty: 'MEDIUM',
+    tags: ['strisce', 'asfalto', 'attraversamenti'],
+    sections: [
+      {
+        id: 'strisce-longitudinali',
+        subtitle: 'Strisce Longitudinali',
+        paragraphs: [
+          'STRISCIA CONTINUA: Non può MAI essere oltrepassata. Vieta il sorpasso se per farlo bisogna invadere l\'altra corsia.',
+          'STRISCIA DISCONTINUA (tratteggiata): Può essere oltrepassata per sorpassare o svoltare, se le condizioni di sicurezza lo permettono.'
+        ]
+      }
+    ]
+  },
+  'semafori-vigili': {
+    id: 'semafori-vigili',
+    title: '7. Semafori e Agenti del Traffico',
+    description: 'Regolazione del traffico tramite impianti luminosi e segnalazioni manuali.',
+    difficulty: 'MEDIUM',
+    tags: ['semaforo', 'vigile', 'luci'],
+    sections: [
+      {
+        id: 'luci-semaforo',
+        subtitle: 'Significato delle Luci',
+        paragraphs: [
+          'ROSSO: Arresto assoluto.',
+          'GIALLO FISSO: Obbligo di arresto, a meno che non si sia così vicini all\'incrocio da non potersi fermare in sicurezza.',
+          'GIALLO LAMPEGGIANTE: Procedere con particolare prudenza (semaforo guasto o spento).',
+          'VERDE: Via libera.'
+        ]
+      },
+      {
+        id: 'segnalazioni-vigili',
+        subtitle: 'Segnalazioni degli Agenti',
+        paragraphs: [
+          'Braccia a croce: Equivalgono al ROSSO per chi incrocia le braccia.',
+          'Braccia parallele alla nostra direzione: Equivalgono al VERDE.',
+          'Braccio alzato verticalmente: Equivale al GIALLO FISSO (sgomberare l\'incrocio o fermarsi).'
+        ],
+        mnemonics: ['Il vigile annulla e sostituisce TUTTI gli altri segnali (semafori, cartelli, strisce).']
+      }
+    ]
+  },
+  'segnali-indicazione': {
+    id: 'segnali-indicazione',
+    title: '8. Segnali di Indicazione',
+    description: 'Forniscono informazioni su itinerari, località e servizi.',
+    difficulty: 'EASY',
+    tags: ['indicazione', 'colori', 'autostrada'],
+    sections: [
+      {
+        id: 'colori-indicazione',
+        subtitle: 'I Colori dei Segnali',
+        paragraphs: [
+          'VERDE: Autostrade.',
+          'BLU: Strade extraurbane.',
+          'BIANCO: Strade urbane (centri abitati).',
+          'GIALLO: Segnali temporanei (cantieri).',
+          'MARRONE: Luoghi di interesse turistico o storico.'
+        ]
+      }
+    ]
+  },
+  'segnali-complementari-cantiere': {
+    id: 'segnali-complementari-cantiere',
+    title: '9. Segnali Complementari e di Cantiere',
+    description: 'Delineatori, segnali temporanei e segnaletica di cantiere.',
+    difficulty: 'MEDIUM',
+    tags: ['cantiere', 'giallo', 'delineatori'],
+    sections: [
+      {
+        id: 'segnali-temporanei',
+        subtitle: 'Segnaletica Temporanea',
+        paragraphs: [
+          'I segnali temporanei per cantieri stradali hanno lo sfondo GIALLO.',
+          'In caso di contrasto, la segnaletica temporanea gialla PREVALE su quella permanente.'
+        ]
+      }
+    ]
+  },
+  'pannelli-integrativi': {
+    id: 'pannelli-integrativi',
+    title: '10. Pannelli Integrativi',
+    description: 'Pannelli che completano il significato dei segnali verticali.',
+    difficulty: 'MEDIUM',
+    tags: ['pannelli', 'distanza', 'estesa'],
+    sections: [
+      {
+        id: 'distanza-vs-estesa',
+        subtitle: 'Distanza vs Estesa',
+        paragraphs: [
+          'Distanza: Indica a quanti metri/km si trova il pericolo o la prescrizione (es. "300 m").',
+          'Estesa: Indica la lunghezza del tratto interessato dal pericolo o prescrizione. È caratterizzato da DUE FRECCE nere ai lati della misura (es. "↑ 3 km ↑").'
+        ]
+      }
+    ]
+  },
+  'limiti-di-velocita': {
+    id: 'limiti-di-velocita',
+    title: '11. Limiti di Velocità',
+    description: 'Limiti massimi consentiti e obbligo di regolare la velocità.',
+    difficulty: 'HARD',
+    tags: ['velocità', 'limiti', 'autostrada', 'neopatentati'],
+    sections: [
+      {
+        id: 'limiti-generali',
+        subtitle: 'Limiti Generali (Patente B)',
+        paragraphs: [
+          'Centri abitati: 50 km/h.',
+          'Strade extraurbane secondarie: 90 km/h.',
+          'Strade extraurbane principali: 110 km/h (90 in caso di pioggia).',
+          'Autostrade: 130 km/h (110 in caso di pioggia).'
+        ]
+      },
+      {
+        id: 'limiti-neopatentati',
+        subtitle: 'Limiti per Neopatentati (primi 3 anni)',
+        paragraphs: [
+          'Strade extraurbane principali: MAX 90 km/h.',
+          'Autostrade: MAX 100 km/h.'
+        ]
+      }
+    ]
+  },
+  'distanza-di-sicurezza': {
+    id: 'distanza-di-sicurezza',
+    title: '12. Distanza di Sicurezza',
+    description: 'Calcolo e mantenimento della distanza dal veicolo che precede.',
+    difficulty: 'HARD',
+    tags: ['distanza', 'frenatura', 'reazione'],
+    sections: [
+      {
+        id: 'calcolo-distanza',
+        subtitle: 'Come si calcola',
+        paragraphs: [
+          'La distanza di sicurezza deve essere almeno uguale allo SPAZIO PERCORSO NEL TEMPO DI REAZIONE (circa 1 secondo).',
+          'Aumenta se: la strada è bagnata/innevata, il veicolo è carico, i freni/pneumatici sono usurati, il conducente è stanco.'
+        ],
+        trickQuestions: [
+          {
+            question: 'La distanza di sicurezza deve essere almeno uguale allo spazio di frenatura.',
+            isTrue: false,
+            explanation: 'Falso. Deve essere almeno uguale allo spazio percorso nel tempo di reazione.'
+          }
+        ]
+      }
+    ]
+  },
+  'norme-di-circolazione': {
+    id: 'norme-di-circolazione',
+    title: '13. Norme di Circolazione',
+    description: 'Posizione dei veicoli sulla carreggiata, cambio di direzione e corsia.',
+    difficulty: 'MEDIUM',
+    tags: ['carreggiata', 'destra', 'svolta'],
+    sections: [
+      {
+        id: 'posizione-veicoli',
+        subtitle: 'Posizione sulla carreggiata',
+        paragraphs: [
+          'I veicoli devono circolare sulla parte destra della carreggiata e in prossimità del margine destro, anche quando la strada è libera.',
+          'Nelle strade a due o più corsie per senso di marcia, si deve percorrere la corsia più libera a destra. Le corsie di sinistra sono riservate al sorpasso.'
+        ]
+      }
+    ]
+  },
+  'precedenza-incroci': {
+    id: 'precedenza-incroci',
+    title: '14. Precedenza agli Incroci',
+    description: 'Regole per stabilire l\'ordine di transito nelle intersezioni.',
+    difficulty: 'CRITICAL',
+    tags: ['incroci', 'precedenza', 'destra', 'tram'],
+    sections: [
+      {
+        id: 'regola-generale',
+        subtitle: 'La Regola Generale',
+        paragraphs: [
+          'Negli incroci non segnalati, si ha l\'obbligo di dare la precedenza a chi proviene da DESTRA.',
+          'Il TRAM e i veicoli in emergenza (con sirena e lampeggiante) hanno la precedenza assoluta su tutti.'
+        ]
+      }
+    ]
+  },
+  'sorpasso': {
+    id: 'sorpasso',
+    title: '15. Sorpasso',
+    description: 'Fasi del sorpasso, divieti e sorpasso a destra.',
+    difficulty: 'CRITICAL',
+    tags: ['sorpasso', 'sinistra', 'destra', 'divieti'],
+    sections: [
+      {
+        id: 'divieti-sorpasso',
+        subtitle: 'Quando è vietato sorpassare',
+        paragraphs: [
+          'In prossimità e in corrispondenza di curve e dossi su strade a due corsie a doppio senso.',
+          'Agli incroci non regolati da semaforo o vigile.',
+          'Ai passaggi a livello senza barriere.',
+          'Quando il veicolo che precede si è fermato per far attraversare i pedoni.'
+        ]
+      },
+      {
+        id: 'sorpasso-destra',
+        subtitle: 'Sorpasso a Destra',
+        paragraphs: [
+          'È consentito SOLO in due casi:',
+          '1. Quando il veicolo da sorpassare ha segnalato l\'intenzione di svoltare a sinistra.',
+          '2. Quando il tram marcia al centro della strada e c\'è spazio sufficiente a destra.'
+        ]
+      }
+    ]
+  },
+  'fermata-sosta-arresto': {
+    id: 'fermata-sosta-arresto',
+    title: '16. Fermata, Sosta e Arresto',
+    description: 'Differenza tra fermata e sosta, divieti e parcheggio.',
+    difficulty: 'MEDIUM',
+    tags: ['sosta', 'fermata', 'parcheggio'],
+    sections: [
+      {
+        id: 'differenza-fermata-sosta',
+        subtitle: 'Fermata vs Sosta',
+        paragraphs: [
+          'FERMATA: Temporanea sospensione della marcia per far salire/scendere persone. Il conducente deve essere presente e pronto a ripartire.',
+          'SOSTA: Sospensione della marcia protratta nel tempo, con possibilità per il conducente di allontanarsi.'
+        ],
+        mnemonics: ['Il divieto di SOSTA consente la FERMATA. Il divieto di FERMATA vieta ENTRAMBE.']
+      }
+    ]
+  },
+  'norme-varie-autostrade-pannelli': {
+    id: 'norme-varie-autostrade-pannelli',
+    title: '17. Norme Varie e Autostrade',
+    description: 'Norme specifiche per autostrade, strade extraurbane principali e pannelli.',
+    difficulty: 'MEDIUM',
+    tags: ['autostrada', 'pedaggio', 'emergenza', 'inversione'],
+    sections: [
+      {
+        id: 'divieti-autostrada',
+        subtitle: 'Divieti Assoluti',
+        paragraphs: [
+          'È assolutamente vietato: fare retromarcia, fare inversione di marcia, circolare sulla corsia di emergenza (se non per guasto o malessere).',
+          'Sanzioni: Ritiro della patente e fermo del veicolo.'
+        ]
+      }
+    ]
+  },
+  'luci-dispositivi-acustici': {
+    id: 'luci-dispositivi-acustici',
+    title: '18. Luci e Dispositivi Acustici',
+    description: 'Quando accendere i fari, uso dei dispositivi acustici e spie.',
+    difficulty: 'HARD',
+    tags: ['luci', 'fari', 'spie', 'abbaglianti'],
+    sections: [
+      {
+        id: 'quando-accendere',
+        subtitle: 'Quando usare le luci',
+        paragraphs: [
+          'Fuori dai centri abitati (autostrade e strade extraurbane): Anabbaglianti SEMPRE ACCESI, anche di giorno.',
+          'Nei centri abitati: Obbligatori da mezz\'ora dopo il tramonto a mezz\'ora prima del sorgere del sole.',
+          'Abbaglianti: Solo fuori dai centri abitati quando non si incrociano o seguono altri veicoli.'
+        ]
+      }
+    ]
+  },
+  'cinture-casco-sicurezza': {
+    id: 'cinture-casco-sicurezza',
+    title: '19. Cinture, Casco e Sicurezza',
+    description: 'Cinture, seggiolini per bambini, casco e abbigliamento.',
+    difficulty: 'EASY',
+    tags: ['cinture', 'casco', 'seggiolini', 'airbag'],
+    sections: [
+      {
+        id: 'cinture-seggiolini',
+        subtitle: 'Cinture e Seggiolini',
+        paragraphs: [
+          'Le cinture sono obbligatorie per TUTTI gli occupanti (anteriori e posteriori).',
+          'I bambini sotto i 1.50m di altezza devono usare sistemi di ritenuta omologati adeguati al loro peso.',
+          'L\'Airbag può essere disattivato (lato passeggero) SOLO se si posiziona un seggiolino per bambini rivolto all\'indietro.'
+        ]
+      }
+    ]
+  },
+  'patente-punti-documenti': {
+    id: 'patente-punti-documenti',
+    title: '20. Patente, Punti e Documenti',
+    description: 'Categorie di patenti, sistema a punti, revisione e documenti a bordo.',
+    difficulty: 'HARD',
+    tags: ['patente', 'punti', 'revisione', 'libretto'],
+    sections: [
+      {
+        id: 'sistema-punti',
+        subtitle: 'Il Sistema a Punti',
+        paragraphs: [
+          'Si parte con 20 punti. Se ne perdono per infrazioni, se ne guadagnano 2 ogni 2 anni senza infrazioni (max 30).',
+          'Neopatentati: Decurtazione punti RADDOPPIATA per i primi 3 anni.'
+        ]
+      }
+    ]
+  },
+  'incidenti-stradali-comportamenti': {
+    id: 'incidenti-stradali-comportamenti',
+    title: '21. Incidenti e Comportamenti',
+    description: 'Comportamento in caso di incidente, omissione di soccorso.',
+    difficulty: 'CRITICAL',
+    tags: ['incidente', 'soccorso', 'feriti', 'omissione'],
+    sections: [
+      {
+        id: 'primo-soccorso',
+        subtitle: 'Regole di Primo Soccorso',
+        paragraphs: [
+          'Obbligo di fermarsi e prestare assistenza. L\'omissione di soccorso è un REATO PENALE.',
+          'NON spostare i feriti gravi a meno che non ci sia pericolo imminente (es. incendio).',
+          'NON togliere il casco a un motociclista infortunato.',
+          'NON dare da bere o da mangiare ai feriti.'
+        ]
+      }
+    ]
+  },
+  'alcool-droga-primo-soccorso': {
+    id: 'alcool-droga-primo-soccorso',
+    title: '22. Alcool, Droga e Primo Soccorso',
+    description: 'Alcol, droghe, farmaci, stanchezza e distrazioni.',
+    difficulty: 'CRITICAL',
+    tags: ['alcol', 'droghe', 'stanchezza', 'ebbrezza'],
+    sections: [
+      {
+        id: 'alcol-droghe',
+        subtitle: 'Alcol e Sostanze Stupefacenti',
+        paragraphs: [
+          'Il limite legale di tasso alcolemico è 0,5 g/l per i conducenti esperti.',
+          'Per i NEOPATENTATI (primi 3 anni) e i conducenti professionali il limite è ZERO (0,0 g/l).',
+          'L\'assunzione di droghe è SEMPRE vietata e costituisce reato penale.'
+        ],
+        alerts: [
+          'ATTENZIONE: Il caffè, le docce fredde o altri "rimedi della nonna" NON accelerano lo smaltimento dell\'alcol dal sangue. Solo il tempo funziona.'
+        ]
+      }
+    ]
+  },
+  'responsabilita-civile-penale-e-assicurazione': {
+    id: 'responsabilita-civile-penale-e-assicurazione',
+    title: '23. Responsabilità e Assicurazione',
+    description: 'Responsabilità civile, penale e assicurazione obbligatoria.',
+    difficulty: 'MEDIUM',
+    tags: ['rca', 'assicurazione', 'responsabilità', 'penale'],
+    sections: [
+      {
+        id: 'rca-copertura',
+        subtitle: 'Cosa copre la RCA',
+        paragraphs: [
+          'La RCA (Responsabilità Civile Auto) è OBBLIGATORIA.',
+          'Copre i danni causati a TERZI (inclusi i passeggeri del proprio veicolo).',
+          'NON copre i danni subiti dal conducente responsabile del sinistro.',
+          'Il Fondo di Garanzia per le Vittime della Strada risarcisce i danni causati da veicoli non assicurati o non identificati.'
+        ]
+      }
+    ]
+  },
+  'consumi-ambiente-inquinamento': {
+    id: 'consumi-ambiente-inquinamento',
+    title: '24. Consumi e Ambiente',
+    description: 'Inquinamento atmosferico, acustico e smaltimento rifiuti.',
+    difficulty: 'EASY',
+    tags: ['inquinamento', 'rumore', 'ambiente', 'catalizzatore'],
+    sections: [
+      {
+        id: 'ridurre-inquinamento',
+        subtitle: 'Come ridurre l\'inquinamento',
+        paragraphs: [
+          'Evitare accelerate brusche e mantenere una velocità costante.',
+          'Spegnere il motore in caso di arresto prolungato (es. passaggio a livello chiuso).',
+          'Controllare periodicamente la pressione degli pneumatici e i filtri.'
+        ]
+      }
+    ]
+  },
+  'elementi-veicolo-manutenzione-comportamenti': {
+    id: 'elementi-veicolo-manutenzione-comportamenti',
+    title: '25. Veicolo e Manutenzione',
+    description: 'Motore, pneumatici, freni e manutenzione ordinaria.',
+    difficulty: 'HARD',
+    tags: ['motore', 'pneumatici', 'freni', 'olio'],
+    sections: [
+      {
+        id: 'pneumatici',
+        subtitle: 'Pneumatici e Aderenza',
+        paragraphs: [
+          'Lo spessore minimo del battistrada per gli autoveicoli è 1,6 mm.',
+          'Pressione troppo bassa: consumo eccessivo ai bordi, rischio di scoppio, maggiore consumo di carburante.',
+          'Pressione troppo alta: consumo eccessivo al centro, minore aderenza.'
         ]
       }
     ]
   }
 };
 
-// Funzione helper per ottenere la lista di tutte le categorie supportate
 export const getAllTheoryCategories = () => Object.keys(theoryManual);

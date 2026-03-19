@@ -33,6 +33,7 @@ interface AppState {
   startExam: (questions: Question[], isCustom?: boolean) => void;
   answerQuestion: (questionId: string, answer: boolean) => void;
   finishExam: () => Promise<void>;
+  abortExam: () => void;
   clearHistory: () => void;
   importData: (data: string) => void;
   exportData: () => string;
@@ -68,6 +69,14 @@ export const useAppStore = create<AppState>()(
           [questionId]: answer
         }
       })),
+
+      abortExam: () => set({
+        currentExam: null,
+        currentAnswers: {},
+        isExamActive: false,
+        examStartTime: null,
+        isCustomExam: false
+      }),
       
       finishExam: async () => {
         const { currentExam, currentAnswers, history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses, isCustomExam } = get();
@@ -132,18 +141,23 @@ export const useAppStore = create<AppState>()(
       importData: (dataStr) => {
         try {
           const data = JSON.parse(dataStr);
-          if (data.history) {
+          if (data && typeof data === 'object' && Array.isArray(data.history)) {
+            // Basic validation to ensure it's a valid export
             set({
-              history: data.history,
-              totalExamsTaken: data.totalExamsTaken || 0,
-              examsPassed: data.examsPassed || 0,
-              currentStreak: data.currentStreak || 0,
-              maxStreak: data.maxStreak || 0,
-              weaknesses: data.weaknesses || {}
+              history: data.history.slice(0, 100), // Keep max 100 history items to prevent performance issues
+              totalExamsTaken: typeof data.totalExamsTaken === 'number' ? data.totalExamsTaken : 0,
+              examsPassed: typeof data.examsPassed === 'number' ? data.examsPassed : 0,
+              currentStreak: typeof data.currentStreak === 'number' ? data.currentStreak : 0,
+              maxStreak: typeof data.maxStreak === 'number' ? data.maxStreak : 0,
+              weaknesses: typeof data.weaknesses === 'object' ? data.weaknesses : {}
             });
+            alert('Dati importati con successo!');
+          } else {
+            throw new Error('Formato dati non valido');
           }
         } catch (e) {
           console.error("Failed to import data", e);
+          alert('Errore durante l\'importazione dei dati. Il file potrebbe essere corrotto o in un formato non valido.');
         }
       },
       

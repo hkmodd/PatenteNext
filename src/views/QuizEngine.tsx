@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
-import { ChevronLeft, ChevronRight, Check, Cpu, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Cpu, Zap, X } from 'lucide-react';
 import { matrixRules, wordAssociations } from '../data/matrix';
 
-export function QuizEngine({ onFinish }: { onFinish: () => void }) {
-  const { currentExam, currentAnswers, answerQuestion, finishExam, examStartTime } = useAppStore();
+export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCancel: () => void }) {
+  const { currentExam, currentAnswers, answerQuestion, finishExam, abortExam, examStartTime } = useAppStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes for Patente B
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showAbortModal, setShowAbortModal] = useState(false);
   const [showMatrixHint, setShowMatrixHint] = useState(false);
 
   useEffect(() => {
@@ -97,6 +98,9 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
       {/* Top Bar */}
       <header className="border-b border-surface-border bg-surface/90 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-50 pt-safe">
         <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => setShowAbortModal(true)} className="text-secondary hover:text-danger hover:bg-danger/10 -ml-2">
+            <X className="w-5 h-5" />
+          </Button>
           <div className="font-mono text-xs sm:text-sm text-secondary font-bold uppercase tracking-widest">
             SEQ // <span className="text-primary">{String(currentIndex + 1).padStart(2, '0')}</span><span className="opacity-50">/{String(currentExam.length).padStart(2, '0')}</span>
           </div>
@@ -330,6 +334,46 @@ export function QuizEngine({ onFinish }: { onFinish: () => void }) {
                 </Button>
                 <Button variant="destructive" onClick={() => handleFinish(false)} aria-label="Conferma consegna">
                   CONSEGNA
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Abort Modal */}
+      <AnimatePresence>
+        {showAbortModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-surface border border-danger p-6 sm:p-8 max-w-md w-full shadow-[0_0_30px_rgba(255,0,0,0.15)]"
+            >
+              <h3 className="text-xl font-display font-bold uppercase text-danger mb-4 flex items-center gap-2">
+                <X className="w-6 h-6" />
+                Annulla Simulazione
+              </h3>
+              <p className="font-mono text-sm text-secondary mb-8">
+                Sei sicuro di voler interrompere la simulazione? I progressi attuali andranno persi e l'esame non verrà registrato nelle statistiche.
+              </p>
+              <div className="flex gap-4 justify-end">
+                <Button variant="outline" onClick={() => setShowAbortModal(false)}>
+                  CONTINUA ESAME
+                </Button>
+                <Button variant="destructive" onClick={() => {
+                  abortExam();
+                  onCancel();
+                }}>
+                  INTERROMPI
                 </Button>
               </div>
             </motion.div>

@@ -68,7 +68,7 @@ export async function syncDatabase(questions: Question[]) {
   await metaTx.done;
 }
 
-export async function getRandomQuestions(count: number): Promise<Question[]> {
+export async function getRandomQuestions(count: number = 30): Promise<Question[]> {
   const db = await getDB();
   
   // Get all questions to group by category
@@ -94,20 +94,48 @@ export async function getRandomQuestions(count: number): Promise<Question[]> {
     questionsByCategory[cat].sort(() => 0.5 - Math.random());
   });
 
-  // Pick 1 from each available category first, then loop
-  let catIndex = 0;
-  while (selectedQuestions.length < count && categories.length > 0) {
-    const currentCatIndex = catIndex % categories.length;
-    const cat = categories[currentCatIndex];
+  // For a realistic exam (30 questions), we try to get at least 1 from each of the 25 categories
+  // and the remaining 5 from primary categories (pericolo, divieto, precedenza, incroci, limiti)
+  const primaryCategories = [
+    'segnali-pericolo',
+    'segnali-divieto',
+    'segnali-precedenza',
+    'precedenza-incroci',
+    'limiti-di-velocita'
+  ];
+
+  // 1. Take 1 question from each available category
+  categories.forEach(cat => {
+    if (selectedQuestions.length < count) {
+      const q = questionsByCategory[cat].pop();
+      if (q) selectedQuestions.push(q);
+    }
+  });
+
+  // 2. If we still need questions (e.g. to reach 30), take from primary categories first
+  let primaryIndex = 0;
+  while (selectedQuestions.length < count && primaryCategories.length > 0) {
+    const cat = primaryCategories[primaryIndex % primaryCategories.length];
+    if (questionsByCategory[cat] && questionsByCategory[cat].length > 0) {
+      const q = questionsByCategory[cat].pop();
+      if (q) selectedQuestions.push(q);
+      primaryIndex++;
+    } else {
+      primaryCategories.splice(primaryIndex % primaryCategories.length, 1);
+    }
+  }
+
+  // 3. If we STILL need questions, take randomly from any remaining category
+  let anyIndex = 0;
+  const remainingCategories = categories.filter(cat => questionsByCategory[cat].length > 0);
+  while (selectedQuestions.length < count && remainingCategories.length > 0) {
+    const cat = remainingCategories[anyIndex % remainingCategories.length];
     const q = questionsByCategory[cat].pop();
-    
     if (q) {
       selectedQuestions.push(q);
-      catIndex++;
+      anyIndex++;
     } else {
-      // Remove category if it has no more questions
-      categories.splice(currentCatIndex, 1);
-      // Do not increment catIndex, so the next iteration checks the new category at this index
+      remainingCategories.splice(anyIndex % remainingCategories.length, 1);
     }
   }
 

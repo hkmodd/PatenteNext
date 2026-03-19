@@ -27,7 +27,7 @@ export default function App() {
         )}
         {currentView === 'quiz' && (
           <motion.div key="quiz" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <QuizEngine onFinish={() => setCurrentView('results')} />
+            <QuizEngine onFinish={() => setCurrentView('results')} onCancel={() => setCurrentView('dashboard')} />
           </motion.div>
         )}
         {currentView === 'results' && (
