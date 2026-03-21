@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, BookOpen, ChevronLeft, Brain, ShieldAlert, Target, Zap, AlertTriangle, CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
+import { X, BookOpen, ChevronLeft, Brain, ShieldAlert, Target, Zap, AlertTriangle, CheckCircle2, XCircle, HelpCircle, Loader2 } from 'lucide-react';
 import { DifficultyLevel } from '../data/theory';
 import { useAppStore } from '../store/useAppStore';
 import { quizDatabase } from '../data/questions';
 import { Button } from './ui/Button';
+import { quantumDB } from '../lib/QuantumDB';
 
 interface TheoryModalProps {
   isOpen: boolean;
@@ -20,23 +21,51 @@ const DifficultyBadge = ({ level }: { level: DifficultyLevel }) => {
     CRITICAL: 'bg-red-500/10 text-red-500 border-red-500/20',
   };
   return (
-    <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border rounded-sm ${colors[level]}`}>
-      {level}
+    <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase border rounded-sm ${colors[level] || colors.MEDIUM}`}>
+      {level || 'MEDIUM'}
     </span>
   );
 };
 
 export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: TheoryModalProps) {
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(initialCategoryId);
-  const theoryManual = useAppStore((state) => state.theory);
+  const [chapter, setChapter] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const theoryManifest = useAppStore((state) => state.theoryManifest);
 
   // Reset state when modal opens/closes or initial category changes
   useEffect(() => {
     setActiveCategoryId(initialCategoryId);
   }, [isOpen, initialCategoryId]);
 
-  const chapter = activeCategoryId ? theoryManual[activeCategoryId] : null;
-  const chaptersList = Object.values(theoryManual);
+  // Load chapter data via QuantumDB when category changes
+  useEffect(() => {
+    if (!activeCategoryId) {
+      setChapter(null);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoading(true);
+    
+    quantumDB.getChapter(activeCategoryId)
+      .then(data => {
+        if (isMounted) {
+          setChapter(data);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load chapter", err);
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [activeCategoryId]);
+
+  const chaptersList = theoryManifest?.chapters || [];
+  const activeChapterMeta = chaptersList.find((c: any) => c.id === activeCategoryId);
 
   return (
     <AnimatePresence>
@@ -69,10 +98,10 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
                 )}
                 <div>
                   <h2 className="font-display font-bold text-lg sm:text-xl uppercase tracking-wider">
-                    {chapter ? chapter.title : 'Manuale di Teoria'}
+                    {activeChapterMeta ? activeChapterMeta.title : 'Sintesi Rapida'}
                   </h2>
                   <p className="text-xs font-mono text-secondary">
-                    {chapter ? `CAPITOLO: ${activeCategoryId}` : 'Indice Generale'}
+                    {activeCategoryId ? `CAPITOLO: ${activeCategoryId}` : 'Indice Generale'}
                   </p>
                 </div>
               </div>
@@ -83,7 +112,12 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
 
             {/* Content */}
             <div className="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
-              {chapter ? (
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center h-full gap-4 text-secondary">
+                  <Loader2 className="w-8 h-8 animate-spin text-accent" />
+                  <p className="font-mono text-xs uppercase tracking-wider">Caricamento frammento da QuantumDB...</p>
+                </div>
+              ) : chapter ? (
                 <div className="space-y-8">
                   <div className="p-4 bg-accent/5 border border-accent/20 text-primary/90 text-sm sm:text-base leading-relaxed font-sans flex flex-col gap-3">
                     <p>{chapter.description}</p>
@@ -252,7 +286,7 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
             
             {/* Footer */}
             <div className="p-4 border-t border-surface-border bg-surface/50 flex justify-end shrink-0">
-              <Button onClick={onClose} variant="outline">Chiudi Manuale</Button>
+              <Button onClick={onClose} variant="outline">Chiudi Sintesi</Button>
             </div>
           </motion.div>
         </>

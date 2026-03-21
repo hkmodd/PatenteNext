@@ -30,8 +30,8 @@ interface AppState {
   examStartTime: number | null;
   isCustomExam: boolean; // True if it's a targeted training or error review
   
-  // Theory Database
-  theory: Record<string, TheoryChapter>;
+  // Theory Database Manifest
+  theoryManifest: any;
   
   // Actions
   startExam: (questions: Question[], isCustom?: boolean) => void;
@@ -41,7 +41,7 @@ interface AppState {
   clearHistory: () => void;
   importData: (data: string) => void;
   exportData: () => string;
-  setTheory: (theory: Record<string, TheoryChapter>) => void;
+  setTheoryManifest: (manifest: any) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -60,9 +60,9 @@ export const useAppStore = create<AppState>()(
       examStartTime: null,
       isCustomExam: false,
       
-      theory: {},
+      theoryManifest: null,
       
-      setTheory: (theory) => set({ theory }),
+      setTheoryManifest: (manifest) => set({ theoryManifest: manifest }),
 
       startExam: (questions, isCustom = false) => set({
         currentExam: questions,

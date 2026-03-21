@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Database, RefreshCw, CheckCircle2, Download, CloudCog } from 'lucide-react';
 import { Button } from './ui/Button';
 import { syncDatabase, getDatabaseMeta } from '../lib/db';
+import { quantumDB } from '../lib/QuantumDB';
 import { useAppStore } from '../store/useAppStore';
 
 // Simulated Remote CDN URL for the database
 const REMOTE_DB_URL = 'https://raw.githubusercontent.com/ministero-trasporti/patente-db/main/database.json';
 const FALLBACK_LOCAL_DB = '/database.json';
-const THEORY_DB_URL = '/theory-database.json';
 
 export function DatabaseSync() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [meta, setMeta] = useState<{ lastSync?: number; totalQuestions?: number; version?: string }>({});
   const [syncStatus, setSyncStatus] = useState<'idle' | 'checking' | 'syncing' | 'success' | 'error'>('idle');
-  const setTheory = useAppStore((state) => state.setTheory);
+  const setTheoryManifest = useAppStore((state) => state.setTheoryManifest);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -44,17 +44,12 @@ export function DatabaseSync() {
 
       await syncDatabase(data);
       
-      // Fetch Theory Database
+      // Fetch Theory Manifest via QuantumDB
       try {
-        const theoryResponse = await fetch(`${THEORY_DB_URL}?t=${Date.now()}`);
-        if (theoryResponse.ok) {
-          const theoryData = await theoryResponse.json();
-          setTheory(theoryData);
-        } else {
-          console.error('Failed to fetch theory database');
-        }
+        const manifest = await quantumDB.initManifest();
+        setTheoryManifest(manifest);
       } catch (theoryErr) {
-        console.error('Error fetching theory database:', theoryErr);
+        console.error('Error fetching theory manifest:', theoryErr);
       }
 
       const m = await getDatabaseMeta();
@@ -80,15 +75,12 @@ export function DatabaseSync() {
     if (!m.totalQuestions) {
       handleSync();
     } else {
-      // If questions exist, just load theory
+      // If questions exist, just load theory manifest
       try {
-        const theoryResponse = await fetch(`${THEORY_DB_URL}?t=${Date.now()}`);
-        if (theoryResponse.ok) {
-          const theoryData = await theoryResponse.json();
-          setTheory(theoryData);
-        }
+        const manifest = await quantumDB.initManifest();
+        setTheoryManifest(manifest);
       } catch (err) {
-        console.error('Error loading theory on startup', err);
+        console.error('Error loading theory manifest on startup', err);
       }
     }
   };

@@ -14,8 +14,9 @@ interface TrainingModalProps {
 
 export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknesses, weaknessCount }: TrainingModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const theoryManual = useAppStore((state) => state.theory);
-  const categories = Object.keys(theoryManual);
+  const theoryManifest = useAppStore((state) => state.theoryManifest);
+  const chaptersList = theoryManifest?.chapters || [];
+  const categories = chaptersList.map((c: any) => c.id);
 
   return (
     <AnimatePresence>
@@ -98,13 +99,12 @@ export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknes
                 </p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {categories.map(cat => {
-                    const chapter = theoryManual[cat];
-                    const isSelected = selectedCategory === cat;
+                  {chaptersList.map((chapter: any) => {
+                    const isSelected = selectedCategory === chapter.id;
                     return (
                       <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
+                        key={chapter.id}
+                        onClick={() => setSelectedCategory(chapter.id)}
                         className={`text-left p-3 border transition-colors flex flex-col gap-1 ${
                           isSelected 
                             ? 'border-accent bg-accent/10' 

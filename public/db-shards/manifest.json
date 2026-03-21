@@ -1,0 +1,319 @@
+{
+  "version": "2026.1.0",
+  "updatedAt": "2026-03-21T05:25:08.565Z",
+  "chapters": [
+    {
+      "id": "definizioni-generali-doveri-strada",
+      "title": "1. Definizioni Generali e Doveri",
+      "description": "Classificazione delle strade, parti della strada e classificazione dei veicoli.",
+      "tags": [
+        "carreggiata",
+        "corsia",
+        "veicoli",
+        "autostrada"
+      ],
+      "difficulty": "EASY",
+      "sectionCount": 2
+    },
+    {
+      "id": "segnali-pericolo",
+      "title": "2. Segnali di Pericolo",
+      "description": "Preannunciano situazioni di pericolo, richiedendo di moderare la velocità.",
+      "tags": [
+        "pericolo",
+        "triangoli",
+        "150m"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "segnali-divieto",
+      "title": "3. Segnali di Divieto",
+      "description": "Vietano il transito, determinate manovre o impongono limiti.",
+      "tags": [
+        "divieto",
+        "tondi",
+        "rosso"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 1
+    },
+    {
+      "id": "segnali-obbligo",
+      "title": "4. Segnali di Obbligo",
+      "description": "Impongono un comportamento specifico, come direzioni obbligatorie o limiti minimi.",
+      "tags": [
+        "obbligo",
+        "tondi",
+        "blu"
+      ],
+      "difficulty": "EASY",
+      "sectionCount": 1
+    },
+    {
+      "id": "segnali-precedenza",
+      "title": "5. Segnali di Precedenza",
+      "description": "Regolano il diritto di precedenza agli incroci e nei sensi unici alternati.",
+      "tags": [
+        "precedenza",
+        "stop",
+        "incroci"
+      ],
+      "difficulty": "CRITICAL",
+      "sectionCount": 1
+    },
+    {
+      "id": "segnaletica-orizzontale-ostacoli",
+      "title": "6. Segnaletica Orizzontale e Ostacoli",
+      "description": "Strisce, scritte e simboli tracciati sulla pavimentazione stradale.",
+      "tags": [
+        "strisce",
+        "asfalto",
+        "attraversamenti"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "semafori-vigili",
+      "title": "7. Semafori e Agenti del Traffico",
+      "description": "Regolazione del traffico tramite impianti luminosi e segnalazioni manuali.",
+      "tags": [
+        "semaforo",
+        "vigile",
+        "luci"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 3
+    },
+    {
+      "id": "segnali-indicazione",
+      "title": "8. Segnali di Indicazione",
+      "description": "Forniscono informazioni su itinerari, località e servizi.",
+      "tags": [
+        "indicazione",
+        "colori",
+        "autostrada"
+      ],
+      "difficulty": "EASY",
+      "sectionCount": 1
+    },
+    {
+      "id": "segnali-complementari-cantiere",
+      "title": "9. Segnali Complementari e di Cantiere",
+      "description": "Delineatori, segnali temporanei e segnaletica di cantiere.",
+      "tags": [
+        "cantiere",
+        "giallo",
+        "delineatori"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "pannelli-integrativi",
+      "title": "10. Pannelli Integrativi",
+      "description": "Pannelli che completano il significato dei segnali verticali.",
+      "tags": [
+        "pannelli",
+        "distanza",
+        "estesa"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "limiti-di-velocita",
+      "title": "11. Limiti di Velocità",
+      "description": "Limiti massimi consentiti e obbligo di regolare la velocità.",
+      "tags": [
+        "velocità",
+        "limiti",
+        "autostrada",
+        "neopatentati"
+      ],
+      "difficulty": "HARD",
+      "sectionCount": 3
+    },
+    {
+      "id": "distanza-di-sicurezza",
+      "title": "12. Distanza di Sicurezza",
+      "description": "Calcolo e mantenimento della distanza dal veicolo che precede.",
+      "tags": [
+        "distanza",
+        "frenatura",
+        "reazione"
+      ],
+      "difficulty": "HARD",
+      "sectionCount": 2
+    },
+    {
+      "id": "norme-di-circolazione",
+      "title": "13. Norme di Circolazione",
+      "description": "Posizione dei veicoli sulla carreggiata, cambio di direzione e corsia.",
+      "tags": [
+        "carreggiata",
+        "destra",
+        "svolta"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "precedenza-incroci",
+      "title": "14. Precedenza agli Incroci",
+      "description": "Regole per stabilire l'ordine di transito nelle intersezioni.",
+      "tags": [
+        "incroci",
+        "precedenza",
+        "destra",
+        "tram"
+      ],
+      "difficulty": "CRITICAL",
+      "sectionCount": 2
+    },
+    {
+      "id": "sorpasso",
+      "title": "15. Sorpasso",
+      "description": "Fasi del sorpasso, divieti e sorpasso a destra.",
+      "tags": [
+        "sorpasso",
+        "sinistra",
+        "destra",
+        "divieti"
+      ],
+      "difficulty": "CRITICAL",
+      "sectionCount": 3
+    },
+    {
+      "id": "fermata-sosta-arresto",
+      "title": "16. Fermata, Sosta e Arresto",
+      "description": "Differenza tra fermata e sosta, divieti e parcheggio.",
+      "tags": [
+        "sosta",
+        "fermata",
+        "parcheggio"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "norme-varie-autostrade-pannelli",
+      "title": "17. Norme Varie e Autostrade",
+      "description": "Norme specifiche per autostrade, strade extraurbane principali e pannelli.",
+      "tags": [
+        "autostrada",
+        "pedaggio",
+        "emergenza",
+        "inversione"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 1
+    },
+    {
+      "id": "luci-dispositivi-acustici",
+      "title": "18. Luci e Dispositivi Acustici",
+      "description": "Quando accendere i fari, uso dei dispositivi acustici e spie.",
+      "tags": [
+        "luci",
+        "fari",
+        "spie",
+        "abbaglianti"
+      ],
+      "difficulty": "HARD",
+      "sectionCount": 2
+    },
+    {
+      "id": "cinture-casco-sicurezza",
+      "title": "19. Cinture, Casco e Sicurezza",
+      "description": "Cinture, seggiolini per bambini, casco e abbigliamento.",
+      "tags": [
+        "cinture",
+        "casco",
+        "seggiolini",
+        "airbag"
+      ],
+      "difficulty": "EASY",
+      "sectionCount": 2
+    },
+    {
+      "id": "patente-punti-documenti",
+      "title": "20. Patente, Punti e Documenti",
+      "description": "Categorie di patenti, sistema a punti, revisione e documenti a bordo.",
+      "tags": [
+        "patente",
+        "punti",
+        "revisione",
+        "libretto"
+      ],
+      "difficulty": "HARD",
+      "sectionCount": 2
+    },
+    {
+      "id": "incidenti-stradali-comportamenti",
+      "title": "21. Incidenti e Comportamenti",
+      "description": "Comportamento in caso di incidente, omissione di soccorso.",
+      "tags": [
+        "incidente",
+        "soccorso",
+        "feriti",
+        "omissione"
+      ],
+      "difficulty": "CRITICAL",
+      "sectionCount": 2
+    },
+    {
+      "id": "alcool-droga-primo-soccorso",
+      "title": "22. Alcool, Droga e Primo Soccorso",
+      "description": "Alcol, droghe, farmaci, stanchezza e distrazioni.",
+      "tags": [
+        "alcol",
+        "droghe",
+        "stanchezza",
+        "ebbrezza"
+      ],
+      "difficulty": "CRITICAL",
+      "sectionCount": 2
+    },
+    {
+      "id": "responsabilita-civile-penale-e-assicurazione",
+      "title": "23. Responsabilità e Assicurazione",
+      "description": "Responsabilità civile, penale e assicurazione obbligatoria.",
+      "tags": [
+        "rca",
+        "assicurazione",
+        "responsabilità",
+        "penale"
+      ],
+      "difficulty": "MEDIUM",
+      "sectionCount": 2
+    },
+    {
+      "id": "consumi-ambiente-inquinamento",
+      "title": "24. Consumi e Ambiente",
+      "description": "Inquinamento atmosferico, acustico e smaltimento rifiuti.",
+      "tags": [
+        "inquinamento",
+        "rumore",
+        "ambiente",
+        "catalizzatore"
+      ],
+      "difficulty": "EASY",
+      "sectionCount": 2
+    },
+    {
+      "id": "elementi-veicolo-manutenzione-comportamenti",
+      "title": "25. Veicolo e Manutenzione",
+      "description": "Motore, pneumatici, freni e manutenzione ordinaria.",
+      "tags": [
+        "motore",
+        "pneumatici",
+        "freni",
+        "olio"
+      ],
+      "difficulty": "HARD",
+      "sectionCount": 2
+    }
+  ]
+}

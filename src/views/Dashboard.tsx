@@ -249,9 +249,9 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
                   <Target className="w-5 h-5 mr-3" />
                   TRAINING MIRATO
                 </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Manuale di Teoria">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Sintesi Rapida">
                   <BookOpen className="w-5 h-5 mr-3" />
-                  MANUALE TEORIA
+                  SINTESI RAPIDA
                 </Button>
                 <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
                   <Cpu className="w-5 h-5 mr-3" />
