@@ -4,7 +4,7 @@ import { useAppStore } from '../store/useAppStore';
 import { getRandomExam, getExamByCategory, getExamFromWeaknesses, quizDatabase } from '../data/questions';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { Play, Activity, CheckCircle2, XCircle, Download, Upload, Zap, BarChart2, RefreshCw, BookOpen, Target } from 'lucide-react';
+import { Play, Activity, CheckCircle2, XCircle, Download, Upload, Zap, BarChart2, RefreshCw, BookOpen, Target, Heart } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { DatabaseSync } from '../components/DatabaseSync';
 import { TheoryModal } from '../components/TheoryModal';
@@ -184,6 +184,9 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
             <h1 className="text-xl font-display font-bold tracking-widest uppercase">Patente<span className="text-accent">Next</span></h1>
           </div>
           <div className="flex gap-2">
+            <Button variant="ghost" size="icon" onClick={() => window.open('https://github.com/sponsors/your-username', '_blank')} title="Supporta il Progetto" aria-label="Supporta il Progetto">
+              <Heart className="w-5 h-5 text-danger" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={handleImport} title="Importa Dati" aria-label="Importa Dati">
               <Upload className="w-5 h-5" />
             </Button>

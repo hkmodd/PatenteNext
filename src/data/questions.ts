@@ -41,7 +41,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato preannuncia un tratto di strada con pavimentazione irregolare.",
     answer: true,
     category: "segnali-pericolo",
-    imageUrl: "https://www.patentati.it/foto/segnali-pericolo/strada-deformata.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Italian_traffic_signs_-_strada_deformata_%28figura_II_1%29.svg/200px-Italian_traffic_signs_-_strada_deformata_%28figura_II_1%29.svg.png",
     explanation: "Il segnale di 'Strada deformata' preannuncia un tratto di strada in cattivo stato o con pavimentazione irregolare."
   },
   {
@@ -49,7 +49,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato vieta il transito a tutti i veicoli.",
     answer: false,
     category: "segnali-divieto",
-    imageUrl: "https://www.patentati.it/foto/segnali-divieto/divieto-di-transito.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Italian_traffic_signs_-_divieto_di_transito.svg/200px-Italian_traffic_signs_-_divieto_di_transito.svg.png",
     explanation: "Falso. Il segnale vieta il transito a tutti i veicoli (sia a motore che non), ma la domanda potrebbe essere formulata in modo ingannevole. In questo caso, il segnale di 'Divieto di transito' vieta la circolazione nei due sensi a tutti i veicoli."
   },
   {
@@ -64,7 +64,7 @@ export const quizDatabase: Question[] = [
     text: "In presenza del segnale raffigurato è consentito il sorpasso dei veicoli a trazione animale.",
     answer: true,
     category: "sorpasso",
-    imageUrl: "https://www.patentati.it/foto/segnali-divieto/divieto-di-sorpasso.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Italian_traffic_signs_-_divieto_di_sorpasso.svg/200px-Italian_traffic_signs_-_divieto_di_sorpasso.svg.png",
     explanation: "Vero. Il segnale vieta di sorpassare i veicoli a motore, eccetto i ciclomotori e i motocicli. È quindi consentito sorpassare veicoli non a motore come quelli a trazione animale o le biciclette, purché non si superi la striscia continua."
   },
   {
@@ -93,7 +93,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica l'inizio di un'autostrada.",
     answer: false,
     category: "segnali-obbligo",
-    imageUrl: "https://www.patentati.it/foto/segnali-indicazione/strada-extraurbana-principale.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Italian_traffic_signs_-_inizio_strada_extraurbana_principale.svg/200px-Italian_traffic_signs_-_inizio_strada_extraurbana_principale.svg.png",
     explanation: "Falso. Il segnale blu con la sagoma bianca di un'autovettura indica l'inizio di una strada extraurbana principale, non di un'autostrada (che ha sfondo verde)."
   },
   {
@@ -115,7 +115,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica una strada senza uscita.",
     answer: true,
     category: "segnali-indicazione",
-    imageUrl: "https://www.patentati.it/foto/segnali-indicazione/strada-senza-uscita.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Italian_traffic_signs_-_strada_senza_uscita.svg/200px-Italian_traffic_signs_-_strada_senza_uscita.svg.png",
     explanation: "Vero. Il segnale indica che la strada non ha sbocco per i veicoli."
   },
   {
@@ -130,7 +130,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato vieta la sosta ma non la fermata.",
     answer: true,
     category: "segnali-divieto",
-    imageUrl: "https://www.patentati.it/foto/segnali-divieto/divieto-di-sosta.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Italian_traffic_signs_-_divieto_di_sosta.svg/200px-Italian_traffic_signs_-_divieto_di_sosta.svg.png",
     explanation: "Vero. Il segnale di divieto di sosta consente la fermata (breve interruzione della marcia per far salire/scendere passeggeri), purché non si intralci la circolazione."
   },
   {
@@ -138,7 +138,7 @@ export const quizDatabase: Question[] = [
     text: "La spia di colore rosso contrassegnata dal simbolo in figura indica che il freno di stazionamento è inserito.",
     answer: true,
     category: "luci-dispositivi-acustici",
-    imageUrl: "https://www.patentati.it/foto/spie/freno-a-mano.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/ISO_7000_-_0238.svg/200px-ISO_7000_-_0238.svg.png",
     explanation: "Vero. La spia rossa con il punto esclamativo o la lettera P indica l'inserimento del freno a mano o un'anomalia all'impianto frenante."
   },
   {
@@ -153,7 +153,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato preannuncia un passaggio a livello senza barriere.",
     answer: true,
     category: "segnali-pericolo",
-    imageUrl: "https://www.patentati.it/foto/segnali-pericolo/passaggio-a-livello-senza-barriere.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Italian_traffic_signs_-_passaggio_a_livello_senza_barriere.svg/200px-Italian_traffic_signs_-_passaggio_a_livello_senza_barriere.svg.png",
     explanation: "Vero. Il segnale con la locomotiva preannuncia un passaggio a livello sprovvisto di barriere o semibarriere."
   },
   {
@@ -168,7 +168,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica l'obbligo di svoltare a destra.",
     answer: true,
     category: "segnali-obbligo",
-    imageUrl: "https://www.patentati.it/foto/segnali-obbligo/direzione-obbligatoria-destra.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Italian_traffic_signs_-_direzione_obbligatoria_a_destra.svg/200px-Italian_traffic_signs_-_direzione_obbligatoria_a_destra.svg.png",
     explanation: "Vero. Il segnale circolare blu con freccia bianca indica la direzione obbligatoria."
   },
   {
@@ -183,7 +183,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica un attraversamento pedonale.",
     answer: true,
     category: "segnali-pericolo",
-    imageUrl: "https://www.patentati.it/foto/segnali-pericolo/attraversamento-pedonale.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Italian_traffic_signs_-_attraversamento_pedonale.svg/200px-Italian_traffic_signs_-_attraversamento_pedonale.svg.png",
     explanation: "Vero. Il segnale triangolare preannuncia un attraversamento pedonale non regolato da semaforo."
   },
   {
@@ -198,7 +198,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato vieta il sorpasso tra autovetture.",
     answer: false,
     category: "segnali-divieto",
-    imageUrl: "https://www.patentati.it/foto/segnali-divieto/divieto-di-sorpasso-mezzi-pesanti.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Italian_traffic_signs_-_divieto_di_sorpasso_per_i_veicoli_merci_con_massa_a_pieno_carico_superiore_a_3%2C5_t.svg/200px-Italian_traffic_signs_-_divieto_di_sorpasso_per_i_veicoli_merci_con_massa_a_pieno_carico_superiore_a_3%2C5_t.svg.png",
     explanation: "Falso. Il segnale (camion rosso, auto nera) vieta il sorpasso solo ai veicoli merci di massa superiore a 3,5t. Le autovetture possono sorpassare."
   },
   {
@@ -213,7 +213,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica la fine del diritto di precedenza.",
     answer: true,
     category: "segnali-precedenza",
-    imageUrl: "https://www.patentati.it/foto/segnali-precedenza/fine-diritto-di-precedenza.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Italian_traffic_signs_-_fine_del_diritto_di_precedenza.svg/200px-Italian_traffic_signs_-_fine_del_diritto_di_precedenza.svg.png",
     explanation: "Vero. Il rombo giallo con barra nera indica che la strada non gode più del diritto di precedenza."
   },
   {
@@ -228,7 +228,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato obbliga ad arrestarsi all'incrocio.",
     answer: true,
     category: "segnali-precedenza",
-    imageUrl: "https://www.patentati.it/foto/segnali-precedenza/fermarsi-e-dare-precedenza.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Italian_traffic_signs_-_fermarsi_e_dare_precedenza.svg/200px-Italian_traffic_signs_-_fermarsi_e_dare_precedenza.svg.png",
     explanation: "Vero. Il segnale di STOP obbliga a fermarsi sempre in corrispondenza della striscia di arresto e dare la precedenza a destra e a sinistra."
   },
   {
@@ -243,7 +243,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica un senso unico alternato.",
     answer: false,
     category: "segnali-pericolo",
-    imageUrl: "https://www.patentati.it/foto/segnali-pericolo/doppio-senso-di-circolazione.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Italian_traffic_signs_-_doppio_senso_di_circolazione.svg/200px-Italian_traffic_signs_-_doppio_senso_di_circolazione.svg.png",
     explanation: "Falso. Il segnale triangolare con due frecce opposte preannuncia che una strada a senso unico diventa a doppio senso di circolazione."
   },
   {
@@ -258,7 +258,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato vieta la sosta nei giorni festivi.",
     answer: false,
     category: "segnali-divieto",
-    imageUrl: "https://www.patentati.it/foto/segnali-divieto/divieto-di-sosta.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Italian_traffic_signs_-_divieto_di_sosta.svg/200px-Italian_traffic_signs_-_divieto_di_sosta.svg.png",
     explanation: "Falso. Senza pannelli integrativi, nei centri abitati il divieto di sosta vale dalle 8:00 alle 20:00 di tutti i giorni. Fuori dai centri abitati vale 24 ore su 24."
   },
   {
@@ -322,7 +322,7 @@ export const quizDatabase: Question[] = [
     text: "Il segnale raffigurato indica una corsia riservata esclusivamente agli autobus.",
     answer: false,
     category: "segnali-indicazione",
-    imageUrl: "https://www.patentati.it/foto/segnali-indicazione/fermata-autobus.gif",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Italian_traffic_signs_-_fermata_autobus.svg/200px-Italian_traffic_signs_-_fermata_autobus.svg.png",
     explanation: "Falso. Il segnale quadrato blu con l'autobus indica una fermata di autobus, non una corsia riservata."
   },
   {

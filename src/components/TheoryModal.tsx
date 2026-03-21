@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, BookOpen, ChevronLeft, Brain, ShieldAlert, Target, Zap, AlertTriangle, CheckCircle2, XCircle, HelpCircle, Loader2 } from 'lucide-react';
+import { X, BookOpen, ChevronLeft, Brain, ShieldAlert, Target, Zap, AlertTriangle, CheckCircle2, XCircle, HelpCircle, Loader2, Sparkles } from 'lucide-react';
 import { DifficultyLevel } from '../data/theory';
 import { useAppStore } from '../store/useAppStore';
-import { quizDatabase } from '../data/questions';
+import { quizDatabase, Question } from '../data/questions';
 import { Button } from './ui/Button';
 import { quantumDB } from '../lib/QuantumDB';
+import { AITutorModal } from './AITutorModal';
 
 interface TheoryModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(initialCategoryId);
   const [chapter, setChapter] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [tutorQuestion, setTutorQuestion] = useState<{ question: Question, userAnswer: boolean | undefined } | null>(null);
   
   const theoryManifest = useAppStore((state) => state.theoryManifest);
 
@@ -230,11 +232,22 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
                                     <p className="text-sm font-medium text-primary leading-relaxed">
                                       {quiz.text}
                                     </p>
-                                    <div className="flex items-center gap-2 text-xs">
-                                      <span className="text-secondary">Risposta:</span>
-                                      <span className={`font-bold ${quiz.answer ? 'text-emerald-500' : 'text-danger'}`}>
-                                        {quiz.answer ? 'VERO' : 'FALSO'}
-                                      </span>
+                                    <div className="flex items-center justify-between gap-4 mt-2">
+                                      <div className="flex items-center gap-2 text-xs">
+                                        <span className="text-secondary">Risposta:</span>
+                                        <span className={`font-bold ${quiz.answer ? 'text-emerald-500' : 'text-danger'}`}>
+                                          {quiz.answer ? 'VERO' : 'FALSO'}
+                                        </span>
+                                      </div>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm"
+                                        className="h-8 gap-2 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/50"
+                                        onClick={() => setTutorQuestion({ question: quiz, userAnswer: undefined })}
+                                      >
+                                        <Sparkles className="w-3 h-3" />
+                                        <span className="text-xs">Chiedi all'AI Tutor</span>
+                                      </Button>
                                     </div>
                                   </div>
                                 );
@@ -291,6 +304,13 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
           </motion.div>
         </>
       )}
+      
+      <AITutorModal
+        isOpen={tutorQuestion !== null}
+        onClose={() => setTutorQuestion(null)}
+        question={tutorQuestion?.question || null}
+        userAnswer={tutorQuestion?.userAnswer}
+      />
     </AnimatePresence>
   );
 }

@@ -4,12 +4,15 @@ import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
 import { CheckCircle2, XCircle, Home, AlertTriangle, Flame, BookOpen, Brain, Cpu, Zap, Sparkles } from 'lucide-react';
 import { TheoryModal } from '../components/TheoryModal';
+import { AITutorModal } from '../components/AITutorModal';
 import { matrixRules, wordAssociations } from '../data/matrix';
+import { Question } from '../data/questions';
 
 export function Results({ onHome }: { onHome: () => void }) {
   const { history, currentExam, currentStreak, weaknesses } = useAppStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [expandedMatrix, setExpandedMatrix] = useState<string | null>(null);
+  const [tutorQuestion, setTutorQuestion] = useState<{ question: Question, userAnswer: boolean | undefined } | null>(null);
   
   if (history.length === 0 || !currentExam) return null;
 
@@ -194,10 +197,10 @@ export function Results({ onHome }: { onHome: () => void }) {
                             <Button 
                               variant="outline" 
                               className="w-full gap-2 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/50 justify-start"
-                              disabled
+                              onClick={() => setTutorQuestion({ question: q, userAnswer })}
                             >
                               <Sparkles className="w-4 h-4" />
-                              Chiedi all'AI Tutor (In arrivo nella Fase 3)
+                              Chiedi all'AI Tutor
                             </Button>
                           </div>
                           <Button 
@@ -229,6 +232,13 @@ export function Results({ onHome }: { onHome: () => void }) {
         isOpen={selectedCategory !== null} 
         onClose={() => setSelectedCategory(null)} 
         categoryId={selectedCategory} 
+      />
+
+      <AITutorModal
+        isOpen={tutorQuestion !== null}
+        onClose={() => setTutorQuestion(null)}
+        question={tutorQuestion?.question || null}
+        userAnswer={tutorQuestion?.userAnswer}
       />
     </motion.div>
   );
