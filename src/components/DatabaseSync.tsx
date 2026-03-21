@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Database, RefreshCw, CheckCircle2, Download, CloudCog } from 'lucide-react';
 import { Button } from './ui/Button';
 import { syncDatabase, getDatabaseMeta } from '../lib/db';
+import { useAppStore } from '../store/useAppStore';
 
 // Simulated Remote CDN URL for the database
 const REMOTE_DB_URL = 'https://raw.githubusercontent.com/ministero-trasporti/patente-db/main/database.json';
 const FALLBACK_LOCAL_DB = '/database.json';
+const THEORY_DB_URL = '/theory-database.json';
 
 export function DatabaseSync() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [meta, setMeta] = useState<{ lastSync?: number; totalQuestions?: number; version?: string }>({});
   const [syncStatus, setSyncStatus] = useState<'idle' | 'checking' | 'syncing' | 'success' | 'error'>('idle');
+  const setTheory = useAppStore((state) => state.setTheory);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -40,6 +43,20 @@ export function DatabaseSync() {
       }
 
       await syncDatabase(data);
+      
+      // Fetch Theory Database
+      try {
+        const theoryResponse = await fetch(`${THEORY_DB_URL}?t=${Date.now()}`);
+        if (theoryResponse.ok) {
+          const theoryData = await theoryResponse.json();
+          setTheory(theoryData);
+        } else {
+          console.error('Failed to fetch theory database');
+        }
+      } catch (theoryErr) {
+        console.error('Error fetching theory database:', theoryErr);
+      }
+
       const m = await getDatabaseMeta();
       // Add a simulated version based on the current year
       setMeta({ ...m, version: `v${new Date().getFullYear()}.1` });
@@ -62,6 +79,17 @@ export function DatabaseSync() {
     // Auto-sync on first load if no questions are present
     if (!m.totalQuestions) {
       handleSync();
+    } else {
+      // If questions exist, just load theory
+      try {
+        const theoryResponse = await fetch(`${THEORY_DB_URL}?t=${Date.now()}`);
+        if (theoryResponse.ok) {
+          const theoryData = await theoryResponse.json();
+          setTheory(theoryData);
+        }
+      } catch (err) {
+        console.error('Error loading theory on startup', err);
+      }
     }
   };
 

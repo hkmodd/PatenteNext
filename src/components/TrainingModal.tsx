@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Target, Brain, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/Button';
-import { getAllTheoryCategories, theoryManual } from '../data/theory';
+import { useAppStore } from '../store/useAppStore';
 
 interface TrainingModalProps {
   isOpen: boolean;
@@ -14,7 +14,8 @@ interface TrainingModalProps {
 
 export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknesses, weaknessCount }: TrainingModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const categories = getAllTheoryCategories();
+  const theoryManual = useAppStore((state) => state.theory);
+  const categories = Object.keys(theoryManual);
 
   return (
     <AnimatePresence>

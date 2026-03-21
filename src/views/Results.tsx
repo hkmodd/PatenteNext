@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
-import { CheckCircle2, XCircle, Home, AlertTriangle, Flame, BookOpen, Brain, Cpu, Zap } from 'lucide-react';
+import { CheckCircle2, XCircle, Home, AlertTriangle, Flame, BookOpen, Brain, Cpu, Zap, Sparkles } from 'lucide-react';
 import { TheoryModal } from '../components/TheoryModal';
 import { matrixRules, wordAssociations } from '../data/matrix';
 
@@ -180,12 +180,26 @@ export function Results({ onHome }: { onHome: () => void }) {
                         </div>
 
                         <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3">
-                          {q.explanation && (
-                            <div className="flex-1 p-3 sm:p-4 border border-surface-border bg-background/50 font-sans text-sm text-secondary leading-relaxed">
-                              <span className="text-accent font-mono font-bold block mb-1 sm:mb-2 uppercase tracking-wider text-xs">Spiegazione</span>
-                              {q.explanation}
-                            </div>
-                          )}
+                          <div className="flex-1 space-y-3">
+                            {q.explanation ? (
+                              <div className="p-3 sm:p-4 border border-surface-border bg-background/50 font-sans text-sm text-secondary leading-relaxed">
+                                <span className="text-accent font-mono font-bold block mb-1 sm:mb-2 uppercase tracking-wider text-xs">Spiegazione Ufficiale</span>
+                                {q.explanation}
+                              </div>
+                            ) : (
+                              <div className="p-3 sm:p-4 border border-surface-border bg-background/50 font-sans text-sm text-secondary/50 italic">
+                                Spiegazione ufficiale non disponibile per questo quiz.
+                              </div>
+                            )}
+                            <Button 
+                              variant="outline" 
+                              className="w-full gap-2 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/50 justify-start"
+                              disabled
+                            >
+                              <Sparkles className="w-4 h-4" />
+                              Chiedi all'AI Tutor (In arrivo nella Fase 3)
+                            </Button>
+                          </div>
                           <Button 
                             variant="secondary" 
                             className="shrink-0 gap-2 h-auto py-3 sm:py-4"

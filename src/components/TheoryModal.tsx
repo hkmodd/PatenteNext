@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, BookOpen, ChevronLeft, Brain, ShieldAlert, Target, Zap, AlertTriangle, CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
-import { theoryManual, DifficultyLevel } from '../data/theory';
+import { DifficultyLevel } from '../data/theory';
+import { useAppStore } from '../store/useAppStore';
 import { quizDatabase } from '../data/questions';
 import { Button } from './ui/Button';
 
@@ -27,6 +28,7 @@ const DifficultyBadge = ({ level }: { level: DifficultyLevel }) => {
 
 export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: TheoryModalProps) {
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(initialCategoryId);
+  const theoryManual = useAppStore((state) => state.theory);
 
   // Reset state when modal opens/closes or initial category changes
   useEffect(() => {
@@ -108,6 +110,17 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
                             <p key={pIdx}>{p}</p>
                           ))}
                         </div>
+
+                        {section.images && section.images.length > 0 && (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
+                            {section.images.map((img, iIdx) => (
+                              <div key={iIdx} className="border border-surface-border bg-white p-3 flex flex-col items-center justify-center gap-3 text-center shadow-sm">
+                                <img src={`${img.url}?v=2`} alt={img.caption} className="w-16 h-16 sm:w-20 sm:h-20 object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
+                                <span className="text-[10px] sm:text-xs font-mono text-black font-bold leading-tight uppercase tracking-tighter">{img.caption}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {section.alerts && section.alerts.length > 0 && (
                           <div className="mt-4 space-y-2">

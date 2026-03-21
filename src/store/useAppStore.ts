@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Question } from '../data/questions';
+import { TheoryChapter } from '../data/theory';
 import { updateQuestionStats } from '../lib/db';
 
 export interface QuizSession {
@@ -29,6 +30,9 @@ interface AppState {
   examStartTime: number | null;
   isCustomExam: boolean; // True if it's a targeted training or error review
   
+  // Theory Database
+  theory: Record<string, TheoryChapter>;
+  
   // Actions
   startExam: (questions: Question[], isCustom?: boolean) => void;
   answerQuestion: (questionId: string, answer: boolean) => void;
@@ -37,6 +41,7 @@ interface AppState {
   clearHistory: () => void;
   importData: (data: string) => void;
   exportData: () => string;
+  setTheory: (theory: Record<string, TheoryChapter>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -55,6 +60,10 @@ export const useAppStore = create<AppState>()(
       examStartTime: null,
       isCustomExam: false,
       
+      theory: {},
+      
+      setTheory: (theory) => set({ theory }),
+
       startExam: (questions, isCustom = false) => set({
         currentExam: questions,
         currentAnswers: {},
