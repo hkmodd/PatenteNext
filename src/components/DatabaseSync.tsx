@@ -29,7 +29,7 @@ export function DatabaseSync() {
         throw new Error('Simulated remote fetch failure, falling back to local');
       } catch (e) {
         // Fallback to local bundled database
-        const response = await fetch(FALLBACK_LOCAL_DB);
+        const response = await fetch(`${FALLBACK_LOCAL_DB}?t=${Date.now()}`);
         if (!response.ok) throw new Error('Failed to fetch local database');
         data = await response.json();
       }

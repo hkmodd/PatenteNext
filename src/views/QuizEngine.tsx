@@ -157,7 +157,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
               {question.imageUrl && (
                 <div className="w-full max-w-[200px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-3 sm:p-4 border-2 sm:border-4 border-surface-border">
                   <img 
-                    src={question.imageUrl} 
+                    src={`${question.imageUrl}?v=2`} 
                     alt="Segnale stradale" 
                     className="max-w-full max-h-full object-contain mix-blend-multiply"
                     referrerPolicy="no-referrer"

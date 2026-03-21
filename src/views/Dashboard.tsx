@@ -360,8 +360,8 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
                     <CardTitle className="font-mono text-sm tracking-widest uppercase">Analisi Categorie</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="p-0 h-[300px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
+                <CardContent className="p-0 h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={categoryStats}>
                       <PolarGrid stroke="#333" />
                       <PolarAngleAxis dataKey="subject" tick={{ fill: '#888', fontSize: 10, fontFamily: 'Fira Code' }} />
@@ -384,8 +384,8 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
                     <CardTitle className="font-mono text-sm tracking-widest uppercase">Progressione</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 h-[300px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
+                <CardContent className="p-4 h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <LineChart data={progressionData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                       <XAxis dataKey="name" tick={{ fill: '#888', fontSize: 10, fontFamily: 'Fira Code' }} axisLine={false} tickLine={false} />

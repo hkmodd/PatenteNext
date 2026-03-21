@@ -199,7 +199,7 @@ export function Results({ onHome }: { onHome: () => void }) {
 
                       {q.imageUrl && (
                         <div className="w-full sm:w-48 aspect-square bg-white flex items-center justify-center p-2 border-2 border-surface-border shrink-0 mt-4 sm:mt-0">
-                          <img src={q.imageUrl} alt="Segnale" className="max-w-full max-h-full object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
+                          <img src={`${q.imageUrl}?v=2`} alt="Segnale" className="max-w-full max-h-full object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
                         </div>
                       )}
                     </div>
