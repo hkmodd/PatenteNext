@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
+    base: '/PatenteNext/',
     plugins: [
       react(), 
       tailwindcss(),
@@ -20,6 +21,8 @@ export default defineConfig(({mode}) => {
           theme_color: '#030303',
           background_color: '#030303',
           display: 'standalone',
+          scope: '/PatenteNext/',
+          start_url: '/PatenteNext/',
           icons: [
             {
               src: 'icon.svg',

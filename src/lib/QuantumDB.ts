@@ -63,7 +63,7 @@ class QuantumEngine {
   }
 
   private async fetchAndCacheManifest() {
-    const res = await fetch(`/db-shards/manifest.json?t=${Date.now()}`);
+    const res = await fetch(`${import.meta.env.BASE_URL}db-shards/manifest.json?t=${Date.now()}`);
     if (!res.ok) throw new Error('Failed to fetch manifest');
     const manifest = await res.json();
     
@@ -96,7 +96,7 @@ class QuantumEngine {
 
     // 2. Cache MISS: Scarico il frammento specifico (Sharding)
     console.log(`[QuantumDB] Cache MISS per capitolo: ${chapterId}. Download in corso...`);
-    const res = await fetch(`/db-shards/${chapterId}.json`);
+    const res = await fetch(`${import.meta.env.BASE_URL}db-shards/${chapterId}.json`);
     if (!res.ok) throw new Error(`Failed to fetch chapter ${chapterId}`);
     
     const chapterData = await res.json();

@@ -7,7 +7,7 @@ import { useAppStore } from '../store/useAppStore';
 
 // Simulated Remote CDN URL for the database
 const REMOTE_DB_URL = 'https://raw.githubusercontent.com/ministero-trasporti/patente-db/main/database.json';
-const FALLBACK_LOCAL_DB = '/database.json';
+const FALLBACK_LOCAL_DB = `${import.meta.env.BASE_URL}database.json`;
 
 export function DatabaseSync() {
   const [isSyncing, setIsSyncing] = useState(false);
