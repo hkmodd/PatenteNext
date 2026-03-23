@@ -14,6 +14,35 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['icon.svg'],
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+          runtimeCaching: [
+            {
+              // Cache signal images — CacheFirst (they never change)
+              urlPattern: /\/images\/segnali\/.+\.png$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'signal-images',
+                expiration: {
+                  maxEntries: 500,
+                  maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+                },
+              },
+            },
+            {
+              // Cache database.json and db-shards — StaleWhileRevalidate
+              urlPattern: /\/(database\.json|db-shards\/.+\.json)/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'app-data',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+              },
+            },
+          ],
+        },
         manifest: {
           name: 'PatenteNext',
           short_name: 'PatenteNext',
