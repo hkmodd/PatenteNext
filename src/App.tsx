@@ -4,6 +4,7 @@ import { Dashboard } from './views/Dashboard';
 import { QuizEngine } from './views/QuizEngine';
 import { Results } from './views/Results';
 import { useAppStore } from './store/useAppStore';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
 
 type ViewState = 'dashboard' | 'quiz' | 'results';
 
@@ -36,6 +37,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      <PWAInstallBanner />
     </div>
   );
 }
