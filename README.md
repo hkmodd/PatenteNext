@@ -1,4 +1,5 @@
 <div align="center">
+<img width="225" height="64" alt="image" src="https://github.com/user-attachments/assets/1b85e376-f1a9-4326-8da8-07c2a042d05a" />
 
 # 🚗 PatenteNext
 
