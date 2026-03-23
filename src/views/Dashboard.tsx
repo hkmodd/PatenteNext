@@ -184,7 +184,7 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
             <h1 className="text-xl font-display font-bold tracking-widest uppercase">Patente<span className="text-accent">Next</span></h1>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" onClick={() => window.open('https://github.com/sponsors/your-username', '_blank')} title="Supporta il Progetto" aria-label="Supporta il Progetto">
+            <Button variant="ghost" size="icon" onClick={() => window.open('https://ko-fi.com/hkmodd', '_blank')} title="Supporta il Progetto" aria-label="Supporta il Progetto">
               <Heart className="w-5 h-5 text-danger" />
             </Button>
             <Button variant="ghost" size="icon" onClick={handleImport} title="Importa Dati" aria-label="Importa Dati">
@@ -205,11 +205,13 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
           <DatabaseSync />
 
           {/* Main Actions */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-            <div className="lg:col-span-2 border border-surface-border bg-surface/50 p-6 sm:p-12 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-accent/10" />
-              
-              <div className="relative z-10 max-w-xl">
+          {/* Hero + Readiness — single card with inline readiness on desktop */}
+          <div className="border border-surface-border bg-surface/50 p-6 sm:p-12 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-accent/10" />
+            
+            <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
+              {/* Left: Hero Content */}
+              <div className="relative z-10 flex-1 min-w-0">
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -233,84 +235,84 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="font-mono text-sm sm:text-base text-secondary leading-relaxed"
+                  className="font-mono text-sm sm:text-base text-secondary leading-relaxed max-w-xl"
                 >
                   Seleziona il modulo di addestramento. La simulazione ufficiale replica le condizioni esatte dell'esame ministeriale.
                 </motion.p>
               </div>
 
-              <div className="mt-8 sm:mt-12 z-10 flex flex-col sm:flex-row flex-wrap gap-4">
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} disabled={isStarting} aria-label="Inizia Simulazione">
-                  {isStarting ? (
-                    <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
-                  ) : (
-                    <Play className="w-5 h-5 mr-3 fill-current" />
-                  )}
-                  {isStarting ? 'GENERAZIONE...' : 'SIMULAZIONE UFFICIALE'}
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTrainingOpen(true)} disabled={isStarting} aria-label="Training Mirato">
-                  <Target className="w-5 h-5 mr-3" />
-                  TRAINING MIRATO
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Sintesi Rapida">
-                  <BookOpen className="w-5 h-5 mr-3" />
-                  SINTESI RAPIDA
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
-                  <Cpu className="w-5 h-5 mr-3" />
-                  CRACK THE MATRIX
-                </Button>
+              {/* Right: Readiness Index (inline on desktop) */}
+              <div className="shrink-0 mt-8 lg:mt-0 flex flex-col items-center justify-center lg:border-l lg:border-surface-border lg:pl-12 relative">
+                <div className="absolute top-0 left-0 w-full h-1 lg:hidden bg-gradient-to-r from-danger via-warning to-success opacity-50" />
+                
+                <div className="flex items-center gap-2 text-secondary font-mono text-xs font-bold uppercase tracking-widest mb-6">
+                  <Activity className="w-4 h-4" />
+                  Indice di Prontezza
+                </div>
+
+                <div className="relative flex items-center justify-center">
+                  <svg className="w-32 h-32 transform -rotate-90">
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      className="text-surface-border"
+                    />
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={351.8}
+                      strokeDashoffset={351.8 - (351.8 * readinessIndex) / 100}
+                      className={`transition-all duration-1000 ease-out ${
+                        readinessIndex >= 90 ? 'text-success' : 
+                        readinessIndex >= 70 ? 'text-warning' : 
+                        'text-danger'
+                      }`}
+                    />
+                  </svg>
+                  <div className="absolute flex flex-col items-center justify-center">
+                    <span className="font-display font-bold text-4xl text-primary">
+                      {readinessIndex}%
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-center font-mono text-xs text-secondary leading-relaxed max-w-48">
+                  {readinessIndex >= 90 ? 'Pronto per l\'esame. Mantieni il ritmo.' :
+                   readinessIndex >= 70 ? 'Buon livello. Concentrati sugli errori frequenti.' :
+                   'Addestramento insufficiente. Richiesta simulazione intensiva.'}
+                </p>
               </div>
             </div>
 
-            {/* Readiness Index */}
-            <div className="border border-surface-border bg-surface/80 p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-danger via-warning to-success opacity-50" />
-              
-              <div className="flex items-center gap-2 text-secondary font-mono text-xs font-bold uppercase tracking-widest mb-6">
-                <Activity className="w-4 h-4" />
-                Indice di Prontezza
-              </div>
-
-              <div className="relative flex items-center justify-center">
-                <svg className="w-32 h-32 transform -rotate-90">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    fill="transparent"
-                    className="text-surface-border"
-                  />
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    fill="transparent"
-                    strokeDasharray={351.8}
-                    strokeDashoffset={351.8 - (351.8 * readinessIndex) / 100}
-                    className={`transition-all duration-1000 ease-out ${
-                      readinessIndex >= 90 ? 'text-success' : 
-                      readinessIndex >= 70 ? 'text-warning' : 
-                      'text-danger'
-                    }`}
-                  />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="font-display font-bold text-4xl text-primary">
-                    {readinessIndex}%
-                  </span>
-                </div>
-              </div>
-
-              <p className="mt-6 text-center font-mono text-xs text-secondary leading-relaxed">
-                {readinessIndex >= 90 ? 'Pronto per l\'esame. Mantieni il ritmo.' :
-                 readinessIndex >= 70 ? 'Buon livello. Concentrati sugli errori frequenti.' :
-                 'Addestramento insufficiente. Richiesta simulazione intensiva.'}
-              </p>
+            <div className="mt-8 sm:mt-12 z-10 flex flex-col sm:flex-row flex-wrap gap-4">
+              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg" onClick={handleStart} disabled={isStarting} aria-label="Inizia Simulazione">
+                {isStarting ? (
+                  <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                ) : (
+                  <Play className="w-5 h-5 mr-3 fill-current" />
+                )}
+                {isStarting ? 'GENERAZIONE...' : 'SIMULAZIONE UFFICIALE'}
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTrainingOpen(true)} disabled={isStarting} aria-label="Training Mirato">
+                <Target className="w-5 h-5 mr-3" />
+                TRAINING MIRATO
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg" onClick={() => setIsTheoryOpen(true)} aria-label="Sintesi Rapida">
+                <BookOpen className="w-5 h-5 mr-3" />
+                SINTESI RAPIDA
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg border-accent text-accent hover:bg-accent/10" onClick={() => setIsMatrixOpen(true)} aria-label="Crack The Matrix">
+                <Cpu className="w-5 h-5 mr-3" />
+                CRACK THE MATRIX
+              </Button>
             </div>
           </div>
 

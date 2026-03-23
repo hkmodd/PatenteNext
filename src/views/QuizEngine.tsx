@@ -98,10 +98,10 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex flex-col bg-grid-pattern pb-safe"
+      className="h-[100dvh] flex flex-col bg-grid-pattern overflow-hidden"
     >
       {/* Top Bar */}
-      <header className="border-b border-surface-border bg-surface/90 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-50 pt-safe">
+      <header className="border-b border-surface-border bg-surface/90 backdrop-blur-md px-3 sm:px-6 py-2 sm:py-4 flex items-center justify-between sticky top-0 z-50 pt-safe shrink-0">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => setShowAbortModal(true)} className="text-secondary hover:text-danger hover:bg-danger/10 -ml-2">
             <X className="w-5 h-5" />
@@ -121,7 +121,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
       </header>
 
       {/* Progress Bar (based on answered questions) */}
-      <div className="w-full bg-surface h-1 sm:h-1.5">
+      <div className="w-full bg-surface h-1 sm:h-1.5 shrink-0">
         <motion.div 
           className="h-full bg-accent"
           initial={{ width: 0 }}
@@ -130,7 +130,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
         />
       </div>
 
-      <main className="flex-1 flex flex-col max-w-4xl w-full mx-auto p-4 sm:p-6">
+      <main className="flex-1 flex flex-col max-w-4xl w-full mx-auto px-3 py-2 sm:p-6 min-h-0 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={question.id}
@@ -138,9 +138,9 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ type: "spring", stiffness: 400, damping: 40 }}
-            className="flex-1 flex flex-col justify-center"
+            className="flex-1 flex flex-col justify-center min-h-0"
           >
-            <div className="border border-surface-border bg-surface/80 backdrop-blur-sm p-6 sm:p-12 flex flex-col items-center text-center gap-6 sm:gap-8 relative overflow-hidden">
+            <div className="border border-surface-border bg-surface/80 backdrop-blur-sm p-4 sm:p-12 flex flex-col items-center text-center gap-4 sm:gap-8 relative overflow-hidden">
               {/* Decorative Corner */}
               <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-accent opacity-50 m-3 sm:m-4" />
               <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-accent opacity-50 m-3 sm:m-4" />
@@ -160,7 +160,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
               )}
 
               {question.imageUrl && (
-                <div className="w-full max-w-[200px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-3 sm:p-4 border-2 sm:border-4 border-surface-border">
+                <div className="w-full max-w-[140px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-2 sm:p-4 border-2 sm:border-4 border-surface-border">
                   <img 
                     src={resolveImageUrl(question.imageUrl)} 
                     alt="Segnale stradale" 
@@ -171,7 +171,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
                 </div>
               )}
               
-              <h2 className="text-fluid-h2 font-sans font-semibold leading-tight tracking-tight max-w-3xl text-primary mt-4">
+              <h2 className="text-fluid-h2 font-sans font-semibold leading-tight tracking-tight max-w-3xl text-primary mt-2 sm:mt-4">
                 {question.text}
               </h2>
             </div>
@@ -220,11 +220,11 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
             </AnimatePresence>
 
             {/* Answer Buttons */}
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 mt-4 sm:mt-8">
               <Button
                 size="lg"
                 variant={currentAnswer === true ? "default" : "outline"}
-                className={`h-20 sm:h-24 text-2xl sm:text-3xl font-display transition-all ${currentAnswer === true ? 'bg-success text-black hover:bg-success/90 shadow-[4px_4px_0px_0px_rgba(0,230,118,0.3)]' : 'hover:border-success hover:text-success bg-surface/50 backdrop-blur-sm'}`}
+                className={`h-16 sm:h-24 text-xl sm:text-3xl font-display transition-all ${currentAnswer === true ? 'bg-success text-black hover:bg-success/90 shadow-[4px_4px_0px_0px_rgba(0,230,118,0.3)]' : 'hover:border-success hover:text-success bg-surface/50 backdrop-blur-sm'}`}
                 onClick={() => handleAnswer(true)}
                 aria-label="Rispondi Vero"
               >
@@ -233,7 +233,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
               <Button
                 size="lg"
                 variant={currentAnswer === false ? "default" : "outline"}
-                className={`h-20 sm:h-24 text-2xl sm:text-3xl font-display transition-all ${currentAnswer === false ? 'bg-danger text-white hover:bg-danger/90 shadow-[4px_4px_0px_0px_rgba(255,51,102,0.3)]' : 'hover:border-danger hover:text-danger bg-surface/50 backdrop-blur-sm'}`}
+                className={`h-16 sm:h-24 text-xl sm:text-3xl font-display transition-all ${currentAnswer === false ? 'bg-danger text-white hover:bg-danger/90 shadow-[4px_4px_0px_0px_rgba(255,51,102,0.3)]' : 'hover:border-danger hover:text-danger bg-surface/50 backdrop-blur-sm'}`}
                 onClick={() => handleAnswer(false)}
                 aria-label="Rispondi Falso"
               >
@@ -244,8 +244,8 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
         </AnimatePresence>
 
         {/* Question Grid Navigation */}
-        <div className="mt-8 sm:mt-12">
-          <div className="font-mono text-xs text-secondary mb-2 uppercase tracking-widest">Mappa Domande</div>
+        <div className="mt-4 sm:mt-12 shrink-0">
+          <div className="font-mono text-xs text-secondary mb-1 sm:mb-2 uppercase tracking-widest">Mappa Domande</div>
           <div className="grid grid-cols-10 gap-1 sm:gap-2">
             {currentExam.map((q, idx) => {
               const isAnswered = currentAnswers[q.id] !== undefined;
@@ -258,7 +258,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
                     setShowMatrixHint(false);
                   }}
                   className={`
-                    h-8 sm:h-10 font-mono text-[10px] sm:text-xs font-bold transition-all border
+                    h-7 sm:h-10 font-mono text-[9px] sm:text-xs font-bold transition-all border
                     ${isCurrent ? 'border-accent text-accent shadow-[0_0_10px_rgba(255,79,0,0.5)]' : 'border-surface-border'}
                     ${isAnswered && !isCurrent ? 'bg-surface-border text-primary' : ''}
                     ${!isAnswered && !isCurrent ? 'bg-surface/50 text-secondary hover:border-primary' : ''}
@@ -274,7 +274,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
         </div>
 
         {/* Bottom Navigation */}
-        <footer className="mt-6 sm:mt-8 flex items-center justify-between border-t border-surface-border pt-4 sm:pt-6">
+        <footer className="mt-3 sm:mt-8 flex items-center justify-between border-t border-surface-border pt-3 sm:pt-6 pb-safe shrink-0">
           <Button
             variant="ghost"
             onClick={() => {
