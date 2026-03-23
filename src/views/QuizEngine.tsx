@@ -4,6 +4,7 @@ import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
 import { ChevronLeft, ChevronRight, Check, Cpu, Zap, X } from 'lucide-react';
 import { matrixRules, wordAssociations } from '../data/matrix';
+import { resolveImageUrl } from '../lib/resolveImageUrl';
 
 export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCancel: () => void }) {
   const { currentExam, currentAnswers, answerQuestion, finishExam, abortExam, examStartTime } = useAppStore();
@@ -161,7 +162,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
               {question.imageUrl && (
                 <div className="w-full max-w-[200px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-3 sm:p-4 border-2 sm:border-4 border-surface-border">
                   <img 
-                    src={question.imageUrl} 
+                    src={resolveImageUrl(question.imageUrl)} 
                     alt="Segnale stradale" 
                     className="max-w-full max-h-full object-contain mix-blend-multiply"
                     referrerPolicy="no-referrer"

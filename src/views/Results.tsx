@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Home, AlertTriangle, Flame, BookOpen, Brain, Cpu
 import { TheoryModal } from '../components/TheoryModal';
 import { AITutorModal } from '../components/AITutorModal';
 import { matrixRules, wordAssociations } from '../data/matrix';
+import { resolveImageUrl } from '../lib/resolveImageUrl';
 import { Question } from '../data/questions';
 
 export function Results({ onHome }: { onHome: () => void }) {
@@ -216,7 +217,7 @@ export function Results({ onHome }: { onHome: () => void }) {
 
                       {q.imageUrl && (
                         <div className="w-full sm:w-48 aspect-square bg-white flex items-center justify-center p-2 border-2 border-surface-border shrink-0 mt-4 sm:mt-0">
-                          <img src={`${q.imageUrl}?v=2`} alt="Segnale" className="max-w-full max-h-full object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
+                          <img src={`${resolveImageUrl(q.imageUrl)}?v=2`} alt="Segnale" className="max-w-full max-h-full object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
                         </div>
                       )}
                     </div>
