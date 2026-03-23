@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Button } from '../components/ui/Button';
@@ -7,12 +7,22 @@ import { matrixRules, wordAssociations } from '../data/matrix';
 
 export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCancel: () => void }) {
   const { currentExam, currentAnswers, answerQuestion, finishExam, abortExam, examStartTime } = useAppStore();
+  const isCustomExam = useAppStore(s => s.isCustomExam);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes for Patente B
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showAbortModal, setShowAbortModal] = useState(false);
   const [showMatrixHint, setShowMatrixHint] = useState(false);
+
+  const handleFinish = useCallback(async () => {
+    setShowConfirmModal(false);
+    await finishExam();
+    onFinish();
+  }, [finishExam, onFinish]);
+
+  const handleFinishRef = useRef(handleFinish);
+  useEffect(() => { handleFinishRef.current = handleFinish; }, [handleFinish]);
 
   useEffect(() => {
     if (!examStartTime) return;
@@ -24,7 +34,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timer);
-        handleFinish(true);
+        handleFinishRef.current();
       }
     };
 
@@ -53,14 +63,8 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
     if (Object.keys(currentAnswers).length < currentExam.length) {
       setShowConfirmModal(true);
     } else {
-      handleFinish(false);
+      handleFinish();
     }
-  };
-
-  const handleFinish = async (force: boolean = false) => {
-    setShowConfirmModal(false);
-    await finishExam();
-    onFinish();
   };
 
   const formatTime = (seconds: number) => {
@@ -104,7 +108,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
           <div className="font-mono text-xs sm:text-sm text-secondary font-bold uppercase tracking-widest">
             SEQ // <span className="text-primary">{String(currentIndex + 1).padStart(2, '0')}</span><span className="opacity-50">/{String(currentExam.length).padStart(2, '0')}</span>
           </div>
-          {useAppStore.getState().isCustomExam && (
+          {isCustomExam && (
             <div className="hidden sm:flex font-mono text-[10px] text-accent font-bold uppercase tracking-widest items-center gap-1 bg-accent/10 px-2 py-1 rounded-sm">
               TRAINING MIRATO
             </div>
@@ -157,7 +161,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
               {question.imageUrl && (
                 <div className="w-full max-w-[200px] sm:max-w-xs aspect-square bg-white flex items-center justify-center p-3 sm:p-4 border-2 sm:border-4 border-surface-border">
                   <img 
-                    src={`${question.imageUrl}?v=2`} 
+                    src={question.imageUrl} 
                     alt="Segnale stradale" 
                     className="max-w-full max-h-full object-contain mix-blend-multiply"
                     referrerPolicy="no-referrer"
@@ -332,7 +336,7 @@ export function QuizEngine({ onFinish, onCancel }: { onFinish: () => void, onCan
                 <Button variant="outline" onClick={() => setShowConfirmModal(false)} aria-label="Annulla consegna">
                   ANNULLA
                 </Button>
-                <Button variant="destructive" onClick={() => handleFinish(false)} aria-label="Conferma consegna">
+                <Button variant="destructive" onClick={() => handleFinish()} aria-label="Conferma consegna">
                   CONSEGNA
                 </Button>
               </div>

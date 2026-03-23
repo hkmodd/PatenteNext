@@ -29,14 +29,13 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
     // 1. Pass Rate (40%)
     const passRate = (examsPassed / totalExamsTaken) * 100;
     
-    // 2. Recent Performance (40%)
+    // 2. Recent Performance (40%) — uses actual exam total, not hardcoded 30
     const recentExams = history.slice(0, 5);
     const recentScoreAvg = recentExams.length > 0 
-      ? (recentExams.reduce((acc, exam) => acc + exam.score, 0) / (recentExams.length * 30)) * 100 
+      ? (recentExams.reduce((acc, exam) => acc + (exam.score / exam.total), 0) / recentExams.length) * 100
       : 0;
       
     // 3. Weakness Resolution (20%)
-    // Assuming a baseline of 100 questions for simplicity, or just penalize based on count
     const weaknessPenalty = Math.min(weaknessCount * 2, 100);
     const weaknessScore = 100 - weaknessPenalty;
 
@@ -101,6 +100,7 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
     a.href = url;
     a.download = `patentenext-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleImport = () => {

@@ -47,10 +47,10 @@ export const quizDatabase: Question[] = [
   {
     id: "q_002",
     text: "Il segnale raffigurato vieta il transito a tutti i veicoli.",
-    answer: false,
+    answer: true,
     category: "segnali-divieto",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Italian_traffic_signs_-_divieto_di_transito.svg/200px-Italian_traffic_signs_-_divieto_di_transito.svg.png",
-    explanation: "Falso. Il segnale vieta il transito a tutti i veicoli (sia a motore che non), ma la domanda potrebbe essere formulata in modo ingannevole. In questo caso, il segnale di 'Divieto di transito' vieta la circolazione nei due sensi a tutti i veicoli."
+    explanation: "Vero. Il segnale di 'Divieto di transito' vieta la circolazione nei due sensi a tutti i veicoli, sia a motore che non."
   },
   {
     id: "q_003",

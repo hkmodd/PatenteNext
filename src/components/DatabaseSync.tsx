@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Database, RefreshCw, CheckCircle2, Download, CloudCog } from 'lucide-react';
+import { Database, RefreshCw, CheckCircle2, Download, CloudCog, WifiOff } from 'lucide-react';
 import { Button } from './ui/Button';
 import { syncDatabase, getDatabaseMeta } from '../lib/db';
 import { quantumDB } from '../lib/QuantumDB';
@@ -13,9 +13,23 @@ export function DatabaseSync() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [meta, setMeta] = useState<{ lastSync?: number; totalQuestions?: number; version?: string }>({});
   const [syncStatus, setSyncStatus] = useState<'idle' | 'checking' | 'syncing' | 'success' | 'error'>('idle');
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const setTheoryManifest = useAppStore((state) => state.setTheoryManifest);
 
+  // Online/Offline detection
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
   const handleSync = async () => {
+    if (!isOnline) return;
     setIsSyncing(true);
     setSyncStatus('checking');
     try {
@@ -25,11 +39,10 @@ export function DatabaseSync() {
       
       let data;
       try {
-        // Attempt to fetch from remote CDN (simulated)
-        // In a real scenario, this would fetch the latest version
-        // const response = await fetch(REMOTE_DB_URL);
-        // data = await response.json();
-        throw new Error('Simulated remote fetch failure, falling back to local');
+        // Attempt to fetch from remote CDN
+        const response = await fetch(REMOTE_DB_URL);
+        if (!response.ok) throw new Error(`Remote fetch failed: ${response.status}`);
+        data = await response.json();
       } catch (e) {
         // Fallback to local bundled database
         const response = await fetch(`${FALLBACK_LOCAL_DB}?t=${Date.now()}`);
@@ -90,55 +103,71 @@ export function DatabaseSync() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between p-4 bg-surface border border-surface-border rounded-xl">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-accent/10 rounded-lg text-accent relative">
-          {syncStatus === 'checking' || syncStatus === 'syncing' ? (
-            <CloudCog className="w-5 h-5 animate-pulse" />
-          ) : (
-            <Database className="w-5 h-5" />
-          )}
-          {meta.totalQuestions && syncStatus !== 'syncing' && (
-            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-success rounded-full border-2 border-surface"></div>
-          )}
+    <div className="space-y-2">
+      {/* Offline Banner */}
+      {!isOnline && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-500 text-xs font-mono">
+          <WifiOff className="w-4 h-4 shrink-0" />
+          <span>Modalità offline — la sincronizzazione riprenderà quando la connessione sarà disponibile.</span>
         </div>
-        <div>
-          <h3 className="font-display font-bold text-sm flex items-center gap-2">
-            Database Ministeriale 
-            {meta.version && (
-              <span className="px-1.5 py-0.5 bg-accent/20 text-accent rounded text-[10px] font-mono">
-                {meta.version}
-              </span>
+      )}
+
+      <div className="flex items-center justify-between p-4 bg-surface border border-surface-border rounded-xl">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-accent/10 rounded-lg text-accent relative">
+            {syncStatus === 'checking' || syncStatus === 'syncing' ? (
+              <CloudCog className="w-5 h-5 animate-pulse" />
+            ) : !isOnline ? (
+              <WifiOff className="w-5 h-5 text-amber-500" />
+            ) : (
+              <Database className="w-5 h-5" />
             )}
-          </h3>
-          <p className="text-xs text-secondary font-mono flex items-center gap-1">
-            {syncStatus === 'checking' ? 'Verifica aggiornamenti...' :
-             syncStatus === 'syncing' ? 'Download in corso...' :
-             meta.totalQuestions ? `${meta.totalQuestions} quiz (Sincronizzato)` : 
-             'Non sincronizzato'}
-          </p>
+            {meta.totalQuestions && syncStatus !== 'syncing' && (
+              <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-surface ${isOnline ? 'bg-success' : 'bg-amber-500'}`}></div>
+            )}
+          </div>
+          <div>
+            <h3 className="font-display font-bold text-sm flex items-center gap-2">
+              Database Ministeriale 
+              {meta.version && (
+                <span className="px-1.5 py-0.5 bg-accent/20 text-accent rounded text-[10px] font-mono">
+                  {meta.version}
+                </span>
+              )}
+            </h3>
+            <p className="text-xs text-secondary font-mono flex items-center gap-1">
+              {!isOnline ? 'Offline — dati locali' :
+               syncStatus === 'checking' ? 'Verifica aggiornamenti...' :
+               syncStatus === 'syncing' ? 'Download in corso...' :
+               meta.totalQuestions ? `${meta.totalQuestions} quiz (Sincronizzato)` : 
+               'Non sincronizzato'}
+            </p>
+          </div>
         </div>
+        <Button 
+          variant={meta.totalQuestions ? "outline" : "default"} 
+          size="sm" 
+          onClick={handleSync}
+          disabled={isSyncing || !isOnline}
+          className="gap-2"
+        >
+          {isSyncing ? (
+            <RefreshCw className="w-4 h-4 animate-spin" />
+          ) : syncStatus === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 text-success" />
+          ) : !isOnline ? (
+            <WifiOff className="w-4 h-4 text-amber-500" />
+          ) : meta.totalQuestions ? (
+            <RefreshCw className="w-4 h-4" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          <span className="hidden sm:inline">
+            {!isOnline ? 'Offline' : isSyncing ? 'Sinc...' : syncStatus === 'success' ? 'Aggiornato' : meta.totalQuestions ? 'Verifica' : 'Scarica'}
+          </span>
+        </Button>
       </div>
-      <Button 
-        variant={meta.totalQuestions ? "outline" : "default"} 
-        size="sm" 
-        onClick={handleSync}
-        disabled={isSyncing}
-        className="gap-2"
-      >
-        {isSyncing ? (
-          <RefreshCw className="w-4 h-4 animate-spin" />
-        ) : syncStatus === 'success' ? (
-          <CheckCircle2 className="w-4 h-4 text-success" />
-        ) : meta.totalQuestions ? (
-          <RefreshCw className="w-4 h-4" />
-        ) : (
-          <Download className="w-4 h-4" />
-        )}
-        <span className="hidden sm:inline">
-          {isSyncing ? 'Sinc...' : syncStatus === 'success' ? 'Aggiornato' : meta.totalQuestions ? 'Verifica' : 'Scarica'}
-        </span>
-      </Button>
     </div>
   );
 }
+

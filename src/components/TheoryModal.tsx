@@ -7,6 +7,7 @@ import { quizDatabase, Question } from '../data/questions';
 import { Button } from './ui/Button';
 import { quantumDB } from '../lib/QuantumDB';
 import { AITutorModal } from './AITutorModal';
+import { LazyImage } from './LazyImage';
 
 interface TheoryModalProps {
   isOpen: boolean;
@@ -151,7 +152,13 @@ export function TheoryModal({ isOpen, onClose, categoryId: initialCategoryId }: 
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
                             {section.images.map((img, iIdx) => (
                               <div key={iIdx} className="border border-surface-border bg-white p-3 flex flex-col items-center justify-center gap-3 text-center shadow-sm">
-                                <img src={`${img.url}?v=2`} alt={img.caption} className="w-16 h-16 sm:w-20 sm:h-20 object-contain mix-blend-multiply" referrerPolicy="no-referrer" loading="lazy" />
+                                <LazyImage 
+                                  src={`${img.url}?v=2`} 
+                                  alt={img.caption} 
+                                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain mix-blend-multiply" 
+                                  placeholderClassName="w-16 h-16 sm:w-20 sm:h-20"
+                                  referrerPolicy="no-referrer" 
+                                />
                                 <span className="text-[10px] sm:text-xs font-mono text-black font-bold leading-tight uppercase tracking-tighter">{img.caption}</span>
                               </div>
                             ))}

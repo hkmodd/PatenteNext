@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Target, Brain, AlertTriangle } from 'lucide-react';
+import { X, Target, Brain, AlertTriangle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useAppStore } from '../store/useAppStore';
+import { quizDatabase } from '../data/questions';
 
 interface TrainingModalProps {
   isOpen: boolean;
@@ -15,8 +16,49 @@ interface TrainingModalProps {
 export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknesses, weaknessCount }: TrainingModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const theoryManifest = useAppStore((state) => state.theoryManifest);
+  const history = useAppStore((state) => state.history);
   const chaptersList = theoryManifest?.chapters || [];
-  const categories = chaptersList.map((c: any) => c.id);
+
+  // Compute per-category accuracy from exam history
+  const categoryAccuracy = useMemo(() => {
+    const stats: Record<string, { total: number; correct: number }> = {};
+    const recentHistory = history.slice(0, 50);
+
+    recentHistory.forEach(session => {
+      const examQuestions = session.exam || quizDatabase;
+      Object.entries(session.answers).forEach(([qId, userAnswer]) => {
+        const question = examQuestions.find(q => q.id === qId);
+        if (question) {
+          const cat = question.category;
+          if (!stats[cat]) stats[cat] = { total: 0, correct: 0 };
+          stats[cat].total += 1;
+          if (userAnswer === question.answer) {
+            stats[cat].correct += 1;
+          }
+        }
+      });
+    });
+
+    return stats;
+  }, [history]);
+
+  const getAccuracyColor = (pct: number) => {
+    if (pct >= 85) return 'bg-emerald-500';
+    if (pct >= 60) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
+
+  const getAccuracyTextColor = (pct: number) => {
+    if (pct >= 85) return 'text-emerald-500';
+    if (pct >= 60) return 'text-amber-500';
+    return 'text-red-500';
+  };
+
+  const getAccuracyIcon = (pct: number) => {
+    if (pct >= 85) return <TrendingUp className="w-3 h-3" />;
+    if (pct >= 60) return <Minus className="w-3 h-3" />;
+    return <TrendingDown className="w-3 h-3" />;
+  };
 
   return (
     <AnimatePresence>
@@ -69,9 +111,21 @@ export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknes
                     <p className="text-sm text-secondary font-sans">
                       Genera una scheda utilizzando unicamente le domande che hai sbagliato in passato.
                     </p>
-                    <p className="text-xs font-mono text-accent">
-                      Domande nel pool errori: {weaknessCount}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-mono text-accent">
+                        Domande nel pool errori: {weaknessCount}
+                      </p>
+                      {weaknessCount > 10 && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-red-500/10 text-red-500 border border-red-500/20 rounded-sm uppercase">
+                          Critico
+                        </span>
+                      )}
+                      {weaknessCount > 0 && weaknessCount <= 10 && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-sm uppercase">
+                          Da rivedere
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <Button 
                     onClick={onStartWeaknesses} 
@@ -101,22 +155,55 @@ export function TrainingModal({ isOpen, onClose, onStartCategory, onStartWeaknes
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {chaptersList.map((chapter: any) => {
                     const isSelected = selectedCategory === chapter.id;
+                    const stats = categoryAccuracy[chapter.id];
+                    const accuracy = stats ? Math.round((stats.correct / stats.total) * 100) : -1;
+                    const hasData = accuracy >= 0;
+
                     return (
                       <button
                         key={chapter.id}
                         onClick={() => setSelectedCategory(chapter.id)}
-                        className={`text-left p-3 border transition-colors flex flex-col gap-1 ${
+                        className={`text-left p-3 border transition-colors flex flex-col gap-2 ${
                           isSelected 
                             ? 'border-accent bg-accent/10' 
                             : 'border-surface-border bg-background/50 hover:border-accent/50'
                         }`}
                       >
-                        <span className={`font-display font-bold text-sm ${isSelected ? 'text-accent' : 'text-primary'}`}>
-                          {chapter.title}
-                        </span>
-                        <span className="text-[10px] font-mono text-secondary uppercase">
-                          Difficoltà: {chapter.difficulty}
-                        </span>
+                        <div className="flex items-start justify-between gap-2">
+                          <span className={`font-display font-bold text-sm ${isSelected ? 'text-accent' : 'text-primary'}`}>
+                            {chapter.title}
+                          </span>
+                          {hasData && (
+                            <span className={`flex items-center gap-1 text-[10px] font-mono font-bold shrink-0 ${getAccuracyTextColor(accuracy)}`}>
+                              {getAccuracyIcon(accuracy)}
+                              {accuracy}%
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-full h-1.5 bg-surface-border rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${hasData ? getAccuracyColor(accuracy) : 'bg-surface-border'}`}
+                            style={{ width: hasData ? `${accuracy}%` : '0%' }}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-mono text-secondary uppercase">
+                            Difficoltà: {chapter.difficulty}
+                          </span>
+                          {hasData && (
+                            <span className="text-[9px] font-mono text-secondary">
+                              {stats!.total} risposte
+                            </span>
+                          )}
+                          {!hasData && (
+                            <span className="text-[9px] font-mono text-secondary/50 italic">
+                              Nessun dato
+                            </span>
+                          )}
+                        </div>
                       </button>
                     );
                   })}

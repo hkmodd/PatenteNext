@@ -68,6 +68,14 @@ class QuantumEngine {
     const manifest = await res.json();
     
     const db = await this.dbPromise;
+
+    // Invalidate chapter cache if manifest version changed
+    const oldManifest = await db.get('manifest', 'latest');
+    if (oldManifest && oldManifest.version !== manifest.version) {
+      console.log(`[QuantumDB] Manifest version changed (${oldManifest.version} → ${manifest.version}), clearing chapter cache`);
+      await db.clear('chapters');
+    }
+
     await db.put('manifest', manifest, 'latest');
     return manifest;
   }

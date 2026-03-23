@@ -24,7 +24,9 @@ export function AITutorModal({ isOpen, onClose, question, userAnswer }: AITutorM
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const aiRef = useRef<GoogleGenAI | null>(null);
-  const chatRef = useRef<any>(null);
+  const chatRef = useRef<ReturnType<GoogleGenAI['chats']['create']> | null>(null);
+  const msgIdCounter = useRef(0);
+  const nextMsgId = () => `msg-${++msgIdCounter.current}`;
 
   useEffect(() => {
     if (isOpen && question) {
@@ -35,6 +37,8 @@ export function AITutorModal({ isOpen, onClose, question, userAnswer }: AITutorM
       const initChat = async () => {
         try {
           if (!aiRef.current) {
+            // WARNING: VITE_ env vars are embedded in the client bundle.
+            // For production, route AI requests through a backend proxy.
             aiRef.current = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY });
           }
           
@@ -53,7 +57,7 @@ Categoria: ${question.category.replace(/-/g, ' ')}
 Inizia la conversazione salutando lo studente e spiegando in modo semplice e diretto perché la sua risposta è errata, basandoti sul contesto fornito.`;
 
           chatRef.current = aiRef.current.chats.create({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.0-flash',
             config: {
               systemInstruction,
               temperature: 0.7,
@@ -63,8 +67,8 @@ Inizia la conversazione salutando lo studente e spiegando in modo semplice e dir
           const response = await chatRef.current.sendMessage({ message: "Ciao istruttore, ho sbagliato questa domanda. Puoi aiutarmi a capire perché?" });
           
           setMessages([
-            { id: '1', role: 'user', content: "Ciao istruttore, ho sbagliato questa domanda. Puoi aiutarmi a capire perché?" },
-            { id: '2', role: 'model', content: response.text }
+            { id: nextMsgId(), role: 'user', content: "Ciao istruttore, ho sbagliato questa domanda. Puoi aiutarmi a capire perché?" },
+            { id: nextMsgId(), role: 'model', content: response.text }
           ]);
         } catch (error) {
           console.error("AI Tutor Error:", error);
@@ -89,15 +93,15 @@ Inizia la conversazione salutando lo studente e spiegando in modo semplice e dir
 
     const userMsg = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: userMsg }]);
+    setMessages(prev => [...prev, { id: nextMsgId(), role: 'user', content: userMsg }]);
     setIsLoading(true);
 
     try {
       const response = await chatRef.current.sendMessage({ message: userMsg });
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', content: response.text }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), role: 'model', content: response.text }]);
     } catch (error) {
       console.error("AI Tutor Error:", error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', content: "Si è verificato un errore di comunicazione. Riprova." }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), role: 'model', content: "Si è verificato un errore di comunicazione. Riprova." }]);
     } finally {
       setIsLoading(false);
     }

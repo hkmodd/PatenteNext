@@ -1,6 +1,16 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { Question } from '../data/questions';
 
+/** Fisher-Yates (Knuth) shuffle — unbiased O(n) */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 interface PatenteDB extends DBSchema {
   questions: {
     key: string;
@@ -91,7 +101,7 @@ export async function getRandomQuestions(count: number = 30): Promise<Question[]
   
   // Shuffle questions within each category
   categories.forEach(cat => {
-    questionsByCategory[cat].sort(() => 0.5 - Math.random());
+    questionsByCategory[cat] = shuffle(questionsByCategory[cat]);
   });
 
   // For a realistic exam (30 questions), we try to get at least 1 from each of the 25 categories
@@ -114,14 +124,16 @@ export async function getRandomQuestions(count: number = 30): Promise<Question[]
 
   // 2. If we still need questions (e.g. to reach 30), take from primary categories first
   let primaryIndex = 0;
-  while (selectedQuestions.length < count && primaryCategories.length > 0) {
-    const cat = primaryCategories[primaryIndex % primaryCategories.length];
+  const mutablePrimary = [...primaryCategories];
+  while (selectedQuestions.length < count && mutablePrimary.length > 0) {
+    const idx = primaryIndex % mutablePrimary.length;
+    const cat = mutablePrimary[idx];
     if (questionsByCategory[cat] && questionsByCategory[cat].length > 0) {
       const q = questionsByCategory[cat].pop();
       if (q) selectedQuestions.push(q);
       primaryIndex++;
     } else {
-      primaryCategories.splice(primaryIndex % primaryCategories.length, 1);
+      mutablePrimary.splice(idx, 1);
     }
   }
 
@@ -140,7 +152,7 @@ export async function getRandomQuestions(count: number = 30): Promise<Question[]
   }
 
   // Shuffle the final selection
-  return selectedQuestions.sort(() => 0.5 - Math.random());
+  return shuffle(selectedQuestions);
 }
 
 export async function getQuestionsByCategory(category: string): Promise<Question[]> {

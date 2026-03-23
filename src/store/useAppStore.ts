@@ -96,7 +96,7 @@ export const useAppStore = create<AppState>()(
         const newWeaknesses = { ...weaknesses };
 
         currentExam.forEach(q => {
-          const isCorrect = currentAnswers[q.id] === q.answer;
+          const isCorrect = currentAnswers[q.id] !== undefined && currentAnswers[q.id] === q.answer;
           if (isCorrect) {
             correctCount++;
             // If answered correctly, reduce weakness score (min 0)
