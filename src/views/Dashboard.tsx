@@ -121,7 +121,11 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target?.result as string;
-          importData(content);
+          try {
+            importData(content);
+          } catch {
+            // Import failed — error already logged in store
+          }
         };
         reader.readAsText(file);
       }

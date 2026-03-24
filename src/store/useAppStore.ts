@@ -162,13 +162,12 @@ export const useAppStore = create<AppState>()(
               maxStreak: typeof data.maxStreak === 'number' ? data.maxStreak : 0,
               weaknesses: typeof data.weaknesses === 'object' ? data.weaknesses : {}
             });
-            alert('Dati importati con successo!');
           } else {
             throw new Error('Formato dati non valido');
           }
         } catch (e) {
           console.error("Failed to import data", e);
-          alert('Errore durante l\'importazione dei dati. Il file potrebbe essere corrotto o in un formato non valido.');
+          throw e; // Let the calling component handle user-facing feedback
         }
       },
       
