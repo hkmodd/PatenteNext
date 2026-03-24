@@ -68,7 +68,7 @@ Inizia la conversazione salutando lo studente e spiegando in modo semplice e dir
           
           setMessages([
             { id: nextMsgId(), role: 'user', content: "Ciao istruttore, ho sbagliato questa domanda. Puoi aiutarmi a capire perché?" },
-            { id: nextMsgId(), role: 'model', content: response.text }
+            { id: nextMsgId(), role: 'model', content: response.text ?? 'Nessuna risposta ricevuta. Riprova.' }
           ]);
         } catch (error) {
           console.error("AI Tutor Error:", error);
@@ -98,7 +98,7 @@ Inizia la conversazione salutando lo studente e spiegando in modo semplice e dir
 
     try {
       const response = await chatRef.current.sendMessage({ message: userMsg });
-      setMessages(prev => [...prev, { id: nextMsgId(), role: 'model', content: response.text }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), role: 'model', content: response.text ?? 'Nessuna risposta ricevuta. Riprova.' }]);
     } catch (error) {
       console.error("AI Tutor Error:", error);
       setMessages(prev => [...prev, { id: nextMsgId(), role: 'model', content: "Si è verificato un errore di comunicazione. Riprova." }]);

@@ -63,6 +63,10 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
     setIsTrainingOpen(false);
     try {
       const questions = await getExamByCategory(category, 20);
+      if (questions.length === 0) {
+        alert('Nessuna domanda disponibile per questa categoria.');
+        return;
+      }
       useAppStore.getState().startExam(questions, true);
       onStartQuiz();
     } catch (error) {
@@ -80,6 +84,10 @@ export function Dashboard({ onStartQuiz }: { onStartQuiz: () => void }) {
     try {
       const weaknessIds = Object.keys(weaknesses);
       const questions = await getExamFromWeaknesses(weaknessIds, 20);
+      if (questions.length === 0) {
+        alert('Nessuna domanda trovata nel pool errori.');
+        return;
+      }
       useAppStore.getState().startExam(questions, true);
       onStartQuiz();
     } catch (error) {

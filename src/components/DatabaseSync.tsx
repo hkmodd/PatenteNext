@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Database, RefreshCw, CheckCircle2, Download, CloudCog, WifiOff } from 'lucide-react';
 import { Button } from './ui/Button';
 import { syncDatabase, getDatabaseMeta } from '../lib/db';
@@ -16,6 +16,10 @@ export function DatabaseSync() {
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const setTheoryManifest = useAppStore((state) => state.setTheoryManifest);
 
+  // Track isOnline with ref to avoid stale closures in async callbacks
+  const isOnlineRef = useRef(isOnline);
+  useEffect(() => { isOnlineRef.current = isOnline; }, [isOnline]);
+
   // Online/Offline detection
   useEffect(() => {
     const goOnline = () => setIsOnline(true);
@@ -28,8 +32,8 @@ export function DatabaseSync() {
     };
   }, []);
 
-  const handleSync = async () => {
-    if (!isOnline) return;
+  const handleSync = useCallback(async () => {
+    if (!isOnlineRef.current) return;
     setIsSyncing(true);
     setSyncStatus('checking');
     try {
@@ -78,7 +82,7 @@ export function DatabaseSync() {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [setTheoryManifest]);
 
   const loadMeta = async () => {
     const m = await getDatabaseMeta();

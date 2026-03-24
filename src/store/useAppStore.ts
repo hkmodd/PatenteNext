@@ -88,8 +88,10 @@ export const useAppStore = create<AppState>()(
       }),
       
       finishExam: async () => {
-        const { currentExam, currentAnswers, history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses, isCustomExam } = get();
-        if (!currentExam) return;
+        const { currentExam, currentAnswers, history, totalExamsTaken, examsPassed, currentStreak, maxStreak, weaknesses, isCustomExam, isExamActive } = get();
+        if (!currentExam || !isExamActive) return;
+        // Immediately mark exam as inactive to prevent double-finish races
+        set({ isExamActive: false });
 
         let correctCount = 0;
         const statsPromises: Promise<void>[] = [];
